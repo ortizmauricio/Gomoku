@@ -35,7 +35,8 @@ def placePiece(event, self, canvas):
 				self.value = 2
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "blue")
 			canvas.update()
-
+			print(self.value)
+			checkWin(self.index, self.value)
 
 def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 	for row in range(19):
@@ -45,6 +46,23 @@ def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 		for col in range(19):
 			x+=30
 			board[row].append(boardPlace(x, y, canvas, (row, col)))
+
+def checkWin(index, piece):
+	#Check horizontal
+	for i in range(4,0,-1):
+		occupied = 0
+		if index[1] - 4 < 19:
+			for j in range(0,5):
+				if index[1] - j >= 0:
+					if board[index[0]][index[1]-j].value == piece:
+						print(index, "is occupied")
+						occupied +=1
+
+	if occupied == 5:
+		print("Horizontal win")
+
+	#Check vertical
+
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
