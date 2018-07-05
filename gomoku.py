@@ -49,20 +49,52 @@ def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 
 def checkWin(index, piece):
 	#Check horizontal
-	for i in range(4,0,-1):
+	for i in range(4,-1,-1):
 		occupied = 0
-		if index[1] - 4 < 19:
-			for j in range(0,5):
-				if index[1] - j >= 0:
-					if board[index[0]][index[1]-j].value == piece:
-						print(index, "is occupied")
-						occupied +=1
-
-	if occupied == 5:
-		print("Horizontal win")
+		for j in range(0,5):
+			if index[1] - i + j>= 0 and index[1] - i + j < 19:
+				if board[index[0]][index[1] - i + j].value == piece:
+					print(index[0],index[1] - i + j, "is occupied")
+					occupied +=1
+		if occupied == 5:
+			print("Horizontal win")
+			break
 
 	#Check vertical
+	for i in range(4,-1,-1):
+		occupied = 0
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19:
+				if board[index[0] - i + j][index[1]].value == piece:
+					print(index[0] - i + j,index[1], "is occupied")
+					occupied +=1
+		if occupied == 5:
+			print("Vertical win")
+			break
 
+	#Check right diagonal
+	for i in range(4,-1,-1):
+		occupied = 0
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
+				if board[index[0] - i + j][index[1] - i + j].value == piece:
+					print(index[0] - i + j,index[1], "is occupied")
+					occupied +=1
+		if occupied == 5:
+			print("Right Diagonal win")
+			break	
+
+	#Check left diagonal
+	for i in range(4,-1,-1):
+		occupied = 0
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
+				if board[index[0] - i + j][index[1] + i - j].value == piece:
+					print(index[0] - i + j,index[1], "is occupied")
+					occupied +=1
+		if occupied == 5:
+			print("Left Diagonal win")
+			break
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
