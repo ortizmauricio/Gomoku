@@ -54,10 +54,8 @@ def checkWin(index, piece):
 		for j in range(0,5):
 			if index[1] - i + j>= 0 and index[1] - i + j < 19:
 				if board[index[0]][index[1] - i + j].value == piece:
-					print(index[0],index[1] - i + j, "is occupied")
 					occupied +=1
 		if occupied == 5:
-			print("Horizontal win")
 			break
 
 	#Check vertical
@@ -66,10 +64,8 @@ def checkWin(index, piece):
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19:
 				if board[index[0] - i + j][index[1]].value == piece:
-					print(index[0] - i + j,index[1], "is occupied")
 					occupied +=1
 		if occupied == 5:
-			print("Vertical win")
 			break
 
 	#Check right diagonal
@@ -78,10 +74,8 @@ def checkWin(index, piece):
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
 				if board[index[0] - i + j][index[1] - i + j].value == piece:
-					print(index[0] - i + j,index[1], "is occupied")
 					occupied +=1
 		if occupied == 5:
-			print("Right Diagonal win")
 			break	
 
 	#Check left diagonal
@@ -90,10 +84,8 @@ def checkWin(index, piece):
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
 				if board[index[0] - i + j][index[1] + i - j].value == piece:
-					print(index[0] - i + j,index[1], "is occupied")
 					occupied +=1
 		if occupied == 5:
-			print("Left Diagonal win")
 			break
 
 def run(width = session.width, height = session.height):
