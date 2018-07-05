@@ -14,10 +14,11 @@ session = Game()
 
 
 class boardPlace:
-	def __init__(self, x, y, canvas):
+	def __init__(self, x, y, canvas, index):
 		self.x = x
 		self.y = y
 		self.value = 0
+		self.index = index
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "black", width = "1")
 
 		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
@@ -43,8 +44,7 @@ def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 		board.append([])
 		for col in range(19):
 			x+=30
-			board[row].append(boardPlace(x, y, canvas))
-
+			board[row].append(boardPlace(x, y, canvas, (row, col)))
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
