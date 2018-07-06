@@ -19,7 +19,7 @@ class boardPlace:
 		self.y = y
 		self.value = 0
 		self.index = index
-		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "black", width = "1")
+		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1")
 
 		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
@@ -43,10 +43,19 @@ def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 	for row in range(19):
 		x = 10
 		y+=30
+
 		board.append([])
 		for col in range(19):
 			x+=30
 			board[row].append(boardPlace(x, y, canvas, (row, col)))
+				
+		canvas.create_line(40, y + 15, 610, y + 15,fill = "black", width = 1)
+
+	x = 10
+	for col in range(19):
+		x+=30
+		canvas.create_line(x + 15, 70, x + 15, 640, fill = "black", width = 1)
+		
 
 def checkWin(index, piece):
 	#Check horizontal
