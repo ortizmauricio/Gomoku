@@ -48,9 +48,9 @@ def placePiece(event, self, canvas):
 				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
-					nextPiece = ranked_points[0]
+					nextPiece = ranked_points[0][1]
 					print(nextPiece)
-					#placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
+					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
 		
 					
 			else:
@@ -185,7 +185,7 @@ def rankPoints():
 	for key in point_rank:
 		ranked_points.append([point_rank[key], key])
 
-	ranked_points = sorted(ranked_points, reverse = True))
+	ranked_points.sort(reverse = True)
 
 	
 def run(width = session.width, height = session.height):
