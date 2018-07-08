@@ -102,8 +102,8 @@ def checkWin(index, piece):
 
 
 def generateMonomials(index):
-	'''
-	#Check horizontal
+
+	#Calculate horizontal monomials
 	for i in range(4,-1,-1):
 		tmpMonomial = []
 		for j in range(0,5):
@@ -111,9 +111,9 @@ def generateMonomials(index):
 				tmpMonomial.append((index[0],  index[1] - i + j))
 		if len(tmpMonomial) == 5:
 			print(tmpMonomial)
-	'''
 
-	#Check vertical
+	
+	#Calculate vertifcal monomials
 	for i in range(4,-1,-1):
 		tmpMonomial = []
 		for j in range(0,5):
@@ -121,27 +121,24 @@ def generateMonomials(index):
 				tmpMonomial.append((index[0] - i + j, index[1]))
 		if len(tmpMonomial) == 5:
 			print(tmpMonomial)
-'''
-	#Check right diagonal
+
+	#Calculate right diagonal monomials
 	for i in range(4,-1,-1):
-		occupied = 0
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
-				if board[index[0] - i + j][index[1] - i + j].value == piece:
-					occupied +=1
-		if occupied == 5:
-			return True
+				tmpMonomial.append((index[0] - i + j,index[1] - i + j))
+		if len(tmpMonomial) == 5:
+			print(tmpMonomial)
 
-	#Check left diagonal
+	#Calculate left diagonal monomials
 	for i in range(4,-1,-1):
-		occupied = 0
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
-				if board[index[0] - i + j][index[1] + i - j].value == piece:
-					occupied +=1
-		if occupied == 5:
-			return True
-'''
+				tmpMonomial.append((index[0] - i + j, index[1] + i - j))
+		if len(tmpMonomial) == 5:
+			print(tmpMonomial)
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
