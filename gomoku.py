@@ -143,14 +143,26 @@ def generateMonomials(index):
 		if len(tmpMonomial) == 5:
 			master_monomials.append(tmpMonomial)
 
+def monomialDead(m):
+	for p in m:
+		if board[p[0]][p[1]].value == 2:
+			return True
+	return False
+
 def rankPoints():
+	#Clear list to update all monomials
 	point_rank.clear()
+
+	#Go through all monomials for recalculation
 	for m in master_monomials:
-		for p in m:
-			if p not in point_rank:
-				point_rank[p] = 1
-			else:
-				point_rank[p]+=1
+		#Check that monomial is not dead
+		if not monomialDead(m):
+			for p in m:
+				if board[p[0]][p[1]].value == 0:
+					if p not in point_rank:
+						point_rank[p] = 1
+					else:
+						point_rank[p]+=1
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
