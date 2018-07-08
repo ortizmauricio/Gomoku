@@ -102,6 +102,7 @@ def checkWin(index, piece):
 
 
 def generateMonomials(index):
+	'''
 	#Check horizontal
 	for i in range(4,-1,-1):
 		tmpMonomial = []
@@ -110,18 +111,17 @@ def generateMonomials(index):
 				tmpMonomial.append((index[0],  index[1] - i + j))
 		if len(tmpMonomial) == 5:
 			print(tmpMonomial)
-	
-'''
+	'''
+
 	#Check vertical
 	for i in range(4,-1,-1):
-		occupied = 0
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19:
-				if board[index[0] - i + j][index[1]].value == piece:
-					occupied +=1
-		if occupied == 5:
-			return True
-
+				tmpMonomial.append((index[0] - i + j, index[1]))
+		if len(tmpMonomial) == 5:
+			print(tmpMonomial)
+'''
 	#Check right diagonal
 	for i in range(4,-1,-1):
 		occupied = 0
