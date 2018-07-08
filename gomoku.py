@@ -3,6 +3,7 @@ import random
 
 board =[]
 master_monomials = []
+point_rank = {}
 
 class Game:
 	def __init__(self):
@@ -32,6 +33,8 @@ def placePiece(event, self, canvas):
 				self.value = 1
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 				generateMonomials(self.index)
+				rankPoints()
+				print(point_rank)
 			else:
 				session.player = 1
 				self.value = 2
@@ -139,6 +142,15 @@ def generateMonomials(index):
 				tmpMonomial.append((index[0] - i + j, index[1] + i - j))
 		if len(tmpMonomial) == 5:
 			master_monomials.append(tmpMonomial)
+
+def rankPoints():
+	point_rank.clear()
+	for m in master_monomials:
+		for p in m:
+			if p not in point_rank:
+				point_rank[p] = 1
+			else:
+				point_rank[p]+=1
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
