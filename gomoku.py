@@ -2,7 +2,7 @@ from tkinter import *
 import random
 
 board =[]
-monomials = []
+master_monomials = []
 
 class Game:
 	def __init__(self):
@@ -110,7 +110,7 @@ def generateMonomials(index):
 			if index[1] - i + j>= 0 and index[1] - i + j < 19:
 				tmpMonomial.append((index[0],  index[1] - i + j))
 		if len(tmpMonomial) == 5:
-			print(tmpMonomial)
+			master_monomials.append(tmpMonomial)
 
 	
 	#Calculate vertifcal monomials
@@ -120,7 +120,7 @@ def generateMonomials(index):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19:
 				tmpMonomial.append((index[0] - i + j, index[1]))
 		if len(tmpMonomial) == 5:
-			print(tmpMonomial)
+			master_monomials.append(tmpMonomial)
 
 	#Calculate right diagonal monomials
 	for i in range(4,-1,-1):
@@ -129,7 +129,7 @@ def generateMonomials(index):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
 				tmpMonomial.append((index[0] - i + j,index[1] - i + j))
 		if len(tmpMonomial) == 5:
-			print(tmpMonomial)
+			master_monomials.append(tmpMonomial)
 
 	#Calculate left diagonal monomials
 	for i in range(4,-1,-1):
@@ -138,7 +138,7 @@ def generateMonomials(index):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
 				tmpMonomial.append((index[0] - i + j, index[1] + i - j))
 		if len(tmpMonomial) == 5:
-			print(tmpMonomial)
+			master_monomials.append(tmpMonomial)
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
