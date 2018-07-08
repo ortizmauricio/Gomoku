@@ -2,6 +2,7 @@ from tkinter import *
 import random
 
 board =[]
+monomials = []
 
 class Game:
 	def __init__(self):
@@ -30,6 +31,7 @@ def placePiece(event, self, canvas):
 				session.player = 2
 				self.value = 1
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+				generateMonomials(self.index)
 			else:
 				session.player = 1
 				self.value = 2
@@ -97,6 +99,49 @@ def checkWin(index, piece):
 					occupied +=1
 		if occupied == 5:
 			return True
+
+
+def generateMonomials(index):
+	#Check horizontal
+	for i in range(4,-1,-1):
+		tmpMonomial = []
+		for j in range(0,5):
+			if index[1] - i + j>= 0 and index[1] - i + j < 19:
+				tmpMonomial.append((index[0],  index[1] - i + j))
+		if len(tmpMonomial) == 5:
+			print(tmpMonomial)
+	
+'''
+	#Check vertical
+	for i in range(4,-1,-1):
+		occupied = 0
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19:
+				if board[index[0] - i + j][index[1]].value == piece:
+					occupied +=1
+		if occupied == 5:
+			return True
+
+	#Check right diagonal
+	for i in range(4,-1,-1):
+		occupied = 0
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
+				if board[index[0] - i + j][index[1] - i + j].value == piece:
+					occupied +=1
+		if occupied == 5:
+			return True
+
+	#Check left diagonal
+	for i in range(4,-1,-1):
+		occupied = 0
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
+				if board[index[0] - i + j][index[1] + i - j].value == piece:
+					occupied +=1
+		if occupied == 5:
+			return True
+'''
 
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas):
