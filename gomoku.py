@@ -167,6 +167,13 @@ def monomialDead(m):
 			return True
 	return False
 
+def completionScore(m):
+	score = 1
+	for p in m:
+		if board[p[0]][p[1]].value == 2:
+			score+=score
+	return (score - 2)
+
 def rankPoints():
 	#Clear list to update all monomials
 	point_rank.clear()
@@ -177,8 +184,7 @@ def rankPoints():
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
 					if p not in point_rank:
-						point_rank[p] = 1
-
+						point_rank[p] = 1 + completionScore(m)
 					else:
 						point_rank[p]+=1
 	#Add to list for sorting
