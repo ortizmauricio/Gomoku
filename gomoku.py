@@ -29,11 +29,11 @@ def placePiece(event, self, canvas):
 			if session.player == 1:
 				session.player = 2
 				self.value = 1
-				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "red")
+				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 			else:
 				session.player = 1
 				self.value = 2
-				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "blue")
+				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			canvas.update()
 			if checkWin(self.index, self.value):
 				print("Player ", self.value, " wins!")
