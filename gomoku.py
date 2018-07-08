@@ -104,7 +104,7 @@ def run(width = session.width, height = session.height):
 		canvas.update()
 
 	root = Tk()
-	canvas = Canvas(root, width = width, height = height)
+	canvas = Canvas(root, width = width, height = height, background = "grey")
 	canvas.pack()
 
 	createBoardWrapper(canvas)
