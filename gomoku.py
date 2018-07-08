@@ -49,12 +49,12 @@ def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 			x+=30
 			board[row].append(boardPlace(x, y, canvas, (row, col)))
 				
-		canvas.create_line(40, y + 15, 610, y + 15,fill = "black", width = 1)
+		canvas.create_line(55, y + 15, 595, y + 15,fill = "black", width = 1)
 
 	x = 10
 	for col in range(19):
 		x+=30
-		canvas.create_line(x + 15, 70, x + 15, 640, fill = "black", width = 1)
+		canvas.create_line(x + 15, 85, x + 15, 626, fill = "black", width = 1)
 		
 
 def checkWin(index, piece):
