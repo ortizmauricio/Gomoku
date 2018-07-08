@@ -4,6 +4,7 @@ import random
 board =[]
 master_monomials = []
 point_rank = {}
+ranked_points = []
 
 class Game:
 	def __init__(self):
@@ -47,7 +48,10 @@ def placePiece(event, self, canvas):
 				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
-					print(point_rank)
+					nextPiece = ranked_points[0]
+					print(nextPiece)
+					#placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
+		
 					
 			else:
 				session.player = 1
@@ -166,7 +170,6 @@ def monomialDead(m):
 def rankPoints():
 	#Clear list to update all monomials
 	point_rank.clear()
-	print("List was clear")
 	#Go through all monomials for recalculation
 	for m in master_monomials:
 		#Check that monomial is not dead
@@ -178,6 +181,11 @@ def rankPoints():
 
 					else:
 						point_rank[p]+=1
+	#Add to list for sorting
+	for key in point_rank:
+		ranked_points.append([point_rank[key], key])
+
+	ranked_points = sorted(ranked_points, reverse = True))
 
 	
 def run(width = session.width, height = session.height):
