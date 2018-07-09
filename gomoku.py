@@ -52,7 +52,6 @@ def placePiece(event, self, canvas):
 					#Prioritize adjacency
 					topScore = ranked_points[0][0]
 					tmpTop = []
-					print(ranked_points)
 					for i in ranked_points:
 						if i[0] == topScore:
 							tmpTop.append(i)
@@ -62,11 +61,8 @@ def placePiece(event, self, canvas):
 						i[0]+=(4 - distance)
 
 					tmpTop.sort(reverse = True)
-					print(tmpTop)
 					nextPiece = tmpTop[0][1]
-					print(nextPiece)
 					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
-					print(board[nextPiece[0]][nextPiece[1]].value)
 					session.lastComputerPosition = nextPiece
 
 		
@@ -196,14 +192,13 @@ def completionScore(m):
 def rankPoints():
 	#Clear list to update all monomials
 	point_rank.clear()
-	print(point_rank)
+
 	#Go through all monomials for recalculation
 	for m in master_monomials:
 		#Check that monomial is not dead
 		if not monomialDead(m):
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
-					print(p)
 					if p not in point_rank:
 						point_rank[p] = 1 + completionScore(m)
 					else:
