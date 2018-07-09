@@ -21,6 +21,7 @@ class Game:
 		self.computerFirst = 0
 		self.lastComputerPosition = 0
 		self.title = 0
+		self.humanFirst = True
 
 session = Game()
 
@@ -39,11 +40,13 @@ def placePiece(event, self, canvas):
 	if session.play:
 		if self.value == 0:
 			if session.player == 1:
-				session.player = 2
-				self.value = 1
-				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
-				generateMonomials(self.index)
-				rankPoints()
+				if session.humanFirst:
+					session.humanFirst = True
+					session.player = 2
+					self.value = 1
+					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+					generateMonomials(self.index)
+					rankPoints()
 				#Computer's turn
 				if checkWin(self.index, self.value):
 					canvas.delete(session.title)
@@ -61,8 +64,12 @@ def placePiece(event, self, canvas):
 					print(master_monomials)
 					shortestDistance = math.sqrt(math.pow((self.index[0]-9),2) + math.pow(self.index[1] - 9,2))
 					shortest = self.index
+					if shortest == (9,9):
+						shortest = (9,8)
 					for m in master_monomials:
 						for p in m:
+							if p == self.index:
+								next
 							tmpShort = math.sqrt(math.pow((p[1]-9),2) + math.pow((p[0] - 9),2))
 								
 							if tmpShort < shortestDistance:
@@ -316,6 +323,14 @@ def run(width = session.width, height = session.height):
 
 	createBoardWrapper(canvas)
 
+	menubar = Menu(root)
+
+	optionmenu = Menu(menubar, tearoff=0)
+	optionmenu.add_command(label="Human First")
+	optionmenu.add_command(label="Computer First")
+	optionmenu.add_command(label="Exit", command=root.quit)
+	menubar.add_cascade(label="Options", menu=optionmenu)
+	root.config(menu = menubar)
 	root.mainloop()
 
 run()
