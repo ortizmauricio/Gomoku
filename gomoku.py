@@ -58,14 +58,10 @@ def placePiece(event, self, canvas):
 								
 							if tmpShort < shortestDistance:
 								shortest = p
-								print("New short: ", p ,tmpShort)
+								
 					print(shortest)
-					if board[9][9].value == 0:
-						placePiece(event, board[9][9], canvas)
-						session.lastComputerPosition = (9,9)
-					else:
-						placePiece(event, board[9][8], canvas)
-						session.lastComputerPosition = (9, 8)
+					placePiece(event, board[shortest[0]][shortest[1]], canvas)
+					session.lastComputerPosition = shortest
 					placedPieces.append(session.lastComputerPosition)
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
