@@ -1,5 +1,6 @@
 from tkinter import *
 import random, math
+random.seed()
 
 board =[]
 master_monomials = []
@@ -81,23 +82,32 @@ def placePiece(event, self, canvas):
 
 					#Calculate point that is closest to the center from generated monomials
 					if session.humanFirst:
-						print("Initial starting point")
-						print(master_monomials)
 						shortestDistance = math.sqrt(math.pow((self.index[0]-9),2) + math.pow(self.index[1] - 9,2))
 						shortest = self.index
+						tmpShortest = []
 						if shortest == (9,9) or board[9][9].value != 0:
 							shortest = (9,8)
 						for m in master_monomials:
 							for p in m:
-								if p == self.index:
-									next
+								if p == self.index or p==(9,9):
+									continue
 								tmpShort = math.sqrt(math.pow((p[1]-9),2) + math.pow((p[0] - 9),2))
 									
 								if tmpShort < shortestDistance:
 									shortest = p
+								elif tmpShort == shortestDistance:
+									if p not in tmpShortest:
+										tmpShortest.append(p)
+
 					else:
 						shortest = (9,9)
-								
+		
+					while True:
+						short = random.randint(0, len(tmpShortest))
+						shortest = tmpShortest[short]
+						if board[shortest[0]][shortest[1]].value == 0:
+							break
+					
 					print(shortest)
 					placePiece(event, board[shortest[0]][shortest[1]], canvas)
 					session.lastComputerPosition = shortest
