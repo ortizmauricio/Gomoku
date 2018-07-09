@@ -51,8 +51,9 @@ def placePiece(event, self, canvas):
 				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
-					print(opponent_points)
-					#Prioritize adjacency
+					#Prioritize adjacency by calculating distance
+					#from previous point to top scoring points
+					#and altering score 
 					topScore = ranked_points[0][0]
 					tmpTop = []
 					for i in ranked_points:
@@ -64,6 +65,14 @@ def placePiece(event, self, canvas):
 						i[0]+=(4 - distance)
 
 					tmpTop.sort(reverse = True)
+
+					#Check on opponent to block move if necessary
+					oppTop = []
+					for m in opponent_points:
+						if m[0] >= 7:
+							oppTop.append(m)
+
+					print(oppTop)
 					nextPiece = tmpTop[0][1]
 					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
 					session.lastComputerPosition = nextPiece
@@ -73,7 +82,6 @@ def placePiece(event, self, canvas):
 			else:
 				session.player = 1
 				self.value = 2
-				print("Value was changed to 2")
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			canvas.update()
 			if checkWin(self.index, self.value):
