@@ -6,6 +6,8 @@ master_monomials = []
 point_rank = {}
 ranked_points = []
 placedPieces = []
+topMonomials = []
+
 opponent_rank = {}
 opponent_points = []
 opponentPieces = []
@@ -58,6 +60,8 @@ def placePiece(event, self, canvas):
 					'''
 				else:
 					generateMonomials(session.lastComputerPosition)
+					print("This is the length: ")
+					print(len(master_monomials))
 					rankPoints()
 
 					#Go by distance
@@ -248,19 +252,18 @@ def rankPoints():
 				completion = completionScore(m, 2)
 				if board[p[0]][p[1]].value == 0:
 					if p not in point_rank:
-						point_rank[p] = 1
+						point_rank[p] = [1, completion]
 					else:
-						point_rank[p]+=1
-					point_rank[p]+=completion
+						point_rank[p][0]+=1
+					point_rank[p][0]+=completion
+					point_rank[p][1]+=completion
 		if not monomialDead(m, 2):
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
-					completion = completionScore(m,1)
 					if p not in opponent_rank:
-						opponent_rank[p] = 1
+						opponent_rank[p] = 1 + completionScore(m, 1)
 					else:
 						opponent_rank[p]+=1
-					opponent_rank[p]+=completion
 
 
 	#Add to list for sorting
@@ -268,7 +271,7 @@ def rankPoints():
 	opponent_points.clear()
 
 	for key in point_rank:
-		ranked_points.append([point_rank[key], key])
+		ranked_points.append([point_rank[key][0], key, point_rank[key][1]])
 
 	for key in opponent_rank:
 		opponent_points.append([opponent_rank[key], key])
