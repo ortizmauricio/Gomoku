@@ -20,6 +20,7 @@ class Game:
 		self.height = 700
 		self.computerFirst = 0
 		self.lastComputerPosition = 0
+		self.title = 0
 
 session = Game()
 
@@ -44,6 +45,14 @@ def placePiece(event, self, canvas):
 				generateMonomials(self.index)
 				rankPoints()
 				#Computer's turn
+				if checkWin(self.index, self.value):
+					canvas.delete(session.title)
+					if self.value == 2:
+						session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
+					else:
+						session.title = canvas.create_text(session.width/2, 40, text="Human Wins!", fill="white", font="Helvetica 40 bold ")
+					session.play = False
+
 				if session.computerFirst == 0:
 					session.computerFirst = 1
 
@@ -66,7 +75,7 @@ def placePiece(event, self, canvas):
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
 
-				else:
+				elif session.play:
 
 					#Go by distance
 
@@ -131,7 +140,13 @@ def placePiece(event, self, canvas):
 			canvas.update()
 			if checkWin(self.index, self.value):
 				print("Player ", self.value, " wins!")
+				canvas.delete(session.title)
+				if self.value == 2:
+					session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
+				else:
+					session.title = canvas.create_text(session.width/2, 40, text="Human Wins!", fill="white", font="Helvetica 40 bold ")
 				session.play = False
+			canvas.update()
 
 def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 	for row in range(19):
@@ -149,7 +164,7 @@ def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
 	for col in range(19):
 		x+=30
 		canvas.create_line(x + 15, 85, x + 15, 626, fill = "black", width = 1)
-		
+	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
 
 def checkWin(index, piece):
 	#Check horizontal
