@@ -1,5 +1,5 @@
 from tkinter import *
-import random
+import random, math
 
 board =[]
 master_monomials = []
@@ -48,14 +48,33 @@ def placePiece(event, self, canvas):
 				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
-					nextPiece = ranked_points[0][1]
+
+					#Prioritize adjacency
+					topScore = ranked_points[0][0]
+					tmpTop = []
+					print(ranked_points)
+					for i in ranked_points:
+						if i[0] == topScore:
+							tmpTop.append(i)
+
+					for i in tmpTop:
+						distance = math.sqrt(math.pow((session.lastComputerPosition[0]-i[1][0]),2) + math.pow((session.lastComputerPosition[1] - i[1][1]),2))
+						i[0]+=(4 - distance)
+
+					tmpTop.sort(reverse = True)
+					print(tmpTop)
+					nextPiece = tmpTop[0][1]
 					print(nextPiece)
 					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
+					print(board[nextPiece[0]][nextPiece[1]].value)
+					session.lastComputerPosition = nextPiece
+
 		
 					
 			else:
 				session.player = 1
 				self.value = 2
+				print("Value was changed to 2")
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			canvas.update()
 			if checkWin(self.index, self.value):
@@ -177,21 +196,25 @@ def completionScore(m):
 def rankPoints():
 	#Clear list to update all monomials
 	point_rank.clear()
+	print(point_rank)
 	#Go through all monomials for recalculation
 	for m in master_monomials:
 		#Check that monomial is not dead
 		if not monomialDead(m):
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
+					print(p)
 					if p not in point_rank:
 						point_rank[p] = 1 + completionScore(m)
 					else:
 						point_rank[p]+=1
 	#Add to list for sorting
+	ranked_points.clear()
 	for key in point_rank:
 		ranked_points.append([point_rank[key], key])
 
 	ranked_points.sort(reverse = True)
+
 
 	
 def run(width = session.width, height = session.height):
