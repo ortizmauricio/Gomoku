@@ -4,6 +4,8 @@ import random, math
 board =[]
 master_monomials = []
 point_rank = {}
+opponent_rank = {}
+opponent_points = []
 ranked_points = []
 
 class Game:
@@ -182,17 +184,17 @@ def monomialDead(m):
 			return True
 	return False
 
-def completionScore(m):
+def completionScore(m, v):
 	score = 1
 	for p in m:
-		if board[p[0]][p[1]].value == 2:
+		if board[p[0]][p[1]].value == v:
 			score+=score
-	return (score - 2)
+	return (score - v)
 
 def rankPoints():
 	#Clear list to update all monomials
 	point_rank.clear()
-
+	opponent_rank.clear()
 	#Go through all monomials for recalculation
 	for m in master_monomials:
 		#Check that monomial is not dead
@@ -200,16 +202,27 @@ def rankPoints():
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
 					if p not in point_rank:
-						point_rank[p] = 1 + completionScore(m)
+						point_rank[p] = 1 + completionScore(m, 2)
 					else:
 						point_rank[p]+=1
+		else:
+			for p in m:
+				if board[p[0]][p[1]].value == 0:
+					if p not in point_rank:
+						opponent_rank[p] =  completionScore(m, 1)
+
 	#Add to list for sorting
 	ranked_points.clear()
+	opponent_points.clear()
+
 	for key in point_rank:
 		ranked_points.append([point_rank[key], key])
 
-	ranked_points.sort(reverse = True)
+	for key in opponent_rank:
+		opponent_points.append([opponent_rank[key], key])
 
+	ranked_points.sort(reverse = True)
+	opponent_points.sort(reverse = True)
 
 	
 def run(width = session.width, height = session.height):
