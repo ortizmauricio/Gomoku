@@ -23,6 +23,16 @@ class Game:
 		self.title = 0
 		self.humanFirst = True
 
+	def hardReset(self):
+		self.play = True
+		self.player = 1
+		self.width = 650
+		self.height = 700
+		self.computerFirst = 0
+		self.lastComputerPosition = 0
+		self.title = 0
+		self.humanFirst = True	
+
 session = Game()
 
 
@@ -38,42 +48,55 @@ class boardPlace:
 
 def placePiece(event, self, canvas):
 	if session.play:
-		if self.value == 0:
+		if not session.humanFirst:
+			session.humanFirst = True
+			session.player = 2
+			shortest = (9,9)
+			placePiece(event, board[shortest[0]][shortest[1]], canvas)
+			session.lastComputerPosition = shortest
+			placedPieces.append(session.lastComputerPosition)
+			generateMonomials(session.lastComputerPosition)
+			rankPoints()
+
+		elif self.value == 0:
 			if session.player == 1:
+				session.player = 2
 				if session.humanFirst:
-					session.humanFirst = True
-					session.player = 2
 					self.value = 1
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 					generateMonomials(self.index)
 					rankPoints()
-				#Computer's turn
-				if checkWin(self.index, self.value):
-					canvas.delete(session.title)
-					if self.value == 2:
-						session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
-					else:
-						session.title = canvas.create_text(session.width/2, 40, text="Human Wins!", fill="white", font="Helvetica 40 bold ")
-					session.play = False
+				
+					if checkWin(self.index, self.value):
+						canvas.delete(session.title)
+						if self.value == 2:
+							session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
+						else:
+							session.title = canvas.create_text(session.width/2, 40, text="Human Wins!", fill="white", font="Helvetica 40 bold ")
+						session.play = False
 
+				#Computer's turn
 				if session.computerFirst == 0:
 					session.computerFirst = 1
 
 					#Calculate point that is closest to the center from generated monomials
-					print("Initial starting point")
-					print(master_monomials)
-					shortestDistance = math.sqrt(math.pow((self.index[0]-9),2) + math.pow(self.index[1] - 9,2))
-					shortest = self.index
-					if shortest == (9,9):
-						shortest = (9,8)
-					for m in master_monomials:
-						for p in m:
-							if p == self.index:
-								next
-							tmpShort = math.sqrt(math.pow((p[1]-9),2) + math.pow((p[0] - 9),2))
-								
-							if tmpShort < shortestDistance:
-								shortest = p
+					if session.humanFirst:
+						print("Initial starting point")
+						print(master_monomials)
+						shortestDistance = math.sqrt(math.pow((self.index[0]-9),2) + math.pow(self.index[1] - 9,2))
+						shortest = self.index
+						if shortest == (9,9) or board[9][9].value != 0:
+							shortest = (9,8)
+						for m in master_monomials:
+							for p in m:
+								if p == self.index:
+									next
+								tmpShort = math.sqrt(math.pow((p[1]-9),2) + math.pow((p[0] - 9),2))
+									
+								if tmpShort < shortestDistance:
+									shortest = p
+					else:
+						shortest = (9,9)
 								
 					print(shortest)
 					placePiece(event, board[shortest[0]][shortest[1]], canvas)
@@ -152,7 +175,8 @@ def placePiece(event, self, canvas):
 				session.play = False
 			canvas.update()
 
-def createBoard(canvas, x = ((session.width - 570)/2), y = 40):
+def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
+	session.humanFirst = option
 	for row in range(19):
 		x = 10
 		y+=30
@@ -311,23 +335,41 @@ def rankPoints():
 	ranked_points.sort(reverse = True)
 	opponent_points.sort(reverse = True)
 
+def resetData(canvas):
+	canvas.delete(ALL)
+	board.clear()
+	master_monomials.clear()
+	point_rank.clear()
+	ranked_points.clear()
+	placedPieces.clear()
+	topMonomials.clear()
+
+	opponent_rank.clear()
+	opponent_points.clear()
+	opponentPieces.clear()
+
 	
 def run(width = session.width, height = session.height):
-	def createBoardWrapper(canvas):
-		createBoard(canvas)
+	def createBoardWrapper(canvas, first):
+		session.hardReset()
+		resetData(canvas)
+		if first == 1:
+			createBoard(canvas, True)
+		else:
+			createBoard(canvas, False)
 		canvas.update()
 
 	root = Tk()
 	canvas = Canvas(root, width = width, height = height, background = "grey")
 	canvas.pack()
 
-	createBoardWrapper(canvas)
+	createBoardWrapper(canvas, 1)
 
 	menubar = Menu(root)
 
 	optionmenu = Menu(menubar, tearoff=0)
-	optionmenu.add_command(label="Human First")
-	optionmenu.add_command(label="Computer First")
+	optionmenu.add_command(label="Human First", command = lambda: createBoardWrapper(canvas, 1))
+	optionmenu.add_command(label="Computer First", command = lambda: createBoardWrapper(canvas, 2) )
 	optionmenu.add_command(label="Exit", command=root.quit)
 	menubar.add_cascade(label="Options", menu=optionmenu)
 	root.config(menu = menubar)
