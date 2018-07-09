@@ -81,7 +81,7 @@ def placePiece(event, self, canvas):
 					oppTop = []
 					for m in opponent_points:
 				
-						if m[2] >= 40:
+						if m[2] >= 12:
 							oppTop.append(m)
 					#If opponnent has no advantage or one move away from winning
 					if len(oppTop) == 0 or point_rank[tmpTop[0][1]][1]>=78:
