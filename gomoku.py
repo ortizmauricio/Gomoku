@@ -4,9 +4,11 @@ import random, math
 board =[]
 master_monomials = []
 point_rank = {}
+ranked_points = []
+placedPieces = []
 opponent_rank = {}
 opponent_points = []
-ranked_points = []
+opponentPieces = []
 
 class Game:
 	def __init__(self):
@@ -48,6 +50,7 @@ def placePiece(event, self, canvas):
 					else:
 						placePiece(event, board[9][8], canvas)
 						session.lastComputerPosition = (9, 8)
+					placedPieces.append(lastComputerPosition)
 					rankPoints()
 					'''
 					print("Opponent points: ")
@@ -56,10 +59,17 @@ def placePiece(event, self, canvas):
 				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
+
+					#Go by distance
+
+					#Check if I have open three or open four
+					#Prioritize completition
+
+
 					'''
 					print("Opponent points: ")
 					print(opponent_points)
-					'''
+					
 					#Prioritize adjacency by calculating distance
 					#from previous point to top scoring points
 					#and altering score 
@@ -94,11 +104,14 @@ def placePiece(event, self, canvas):
 								p[0]+=point_rank[p[1]]
 						oppTop.sort(reverse = True)
 						nextPiece = oppTop[0][1]
-					print("Opponent Top: ")
-					print(oppTop)
+
+					'''
+					print(ranked_points)
+					nextPiece = ranked_points[0][1]
+					print(nextPiece)
 					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
 					session.lastComputerPosition = nextPiece
-
+					placedPieces.append(lastComputerPosition)
 		
 					
 			else:
