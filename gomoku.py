@@ -37,6 +37,7 @@ def placePiece(event, self, canvas):
 				session.player = 2
 				self.value = 1
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+				generateMonomials(self.index)
 				#Computer's turn
 				if session.computerFirst == 0:
 					session.computerFirst = 1
@@ -50,7 +51,7 @@ def placePiece(event, self, canvas):
 				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
-
+					print(opponent_points)
 					#Prioritize adjacency
 					topScore = ranked_points[0][0]
 					tmpTop = []
