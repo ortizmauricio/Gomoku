@@ -46,6 +46,20 @@ def placePiece(event, self, canvas):
 				#Computer's turn
 				if session.computerFirst == 0:
 					session.computerFirst = 1
+
+					#Calculate point that is closest to the center from generated monomials
+					print("Initial starting point")
+					print(master_monomials)
+					shortestDistance = math.sqrt(math.pow((self.index[0]-9),2) + math.pow(self.index[1] - 9,2))
+					shortest = self.index
+					for m in master_monomials:
+						for p in m:
+							tmpShort = math.sqrt(math.pow((p[1]-9),2) + math.pow((p[0] - 9),2))
+								
+							if tmpShort < shortestDistance:
+								shortest = p
+								print("New short: ", p ,tmpShort)
+					print(shortest)
 					if board[9][9].value == 0:
 						placePiece(event, board[9][9], canvas)
 						session.lastComputerPosition = (9,9)
