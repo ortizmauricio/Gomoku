@@ -1,18 +1,32 @@
+#Program starts running at run() function
 from tkinter import *
 import random, math
 random.seed()
 
+#All board objects
 board =[]
+
+#Monomials from human and computer
 master_monomials = []
+
+#Stores computer board places and their current score
 point_rank = {}
+
+#Contains computer places along with their overall score and completion score
 ranked_points = []
+
+#All pieces placed by computer
 placedPieces = []
 topMonomials = []
 
+#Stores human board places and their current score
 opponent_rank = {}
+
+#Contains computer places along with their overall score and completion score
 opponent_points = []
 opponentPieces = []
 
+#Contains and controls variables important for game session
 class Game:
 	def __init__(self):
 		self.play = True
@@ -36,7 +50,7 @@ class Game:
 
 session = Game()
 
-
+#Board place object that calls place piece on click
 class boardPlace:
 	def __init__(self, x, y, canvas, index):
 		self.x = x
@@ -47,8 +61,12 @@ class boardPlace:
 
 		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
+#Places piece on the board and carries out decision making
+#for computer piece placing
 def placePiece(event, self, canvas):
+	#If someone hasn't won already
 	if session.play:
+		#If the computer is set to go first
 		if not session.humanFirst:
 			session.humanFirst = True
 			session.player = 2
@@ -58,8 +76,11 @@ def placePiece(event, self, canvas):
 			placedPieces.append(session.lastComputerPosition)
 			generateMonomials(session.lastComputerPosition)
 			rankPoints()
-
+		#If board place is empty
 		elif self.value == 0:
+			#If it's human turn, visually places piece, 
+			#sets session values for opponent, generates move
+			#for computer
 			if session.player == 1:
 				session.player = 2
 				if session.humanFirst:
@@ -67,7 +88,7 @@ def placePiece(event, self, canvas):
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 					generateMonomials(self.index)
 					rankPoints()
-				
+					#Checks if someone has won and displays winning message
 					if checkWin(self.index, self.value):
 						canvas.delete(session.title)
 						if self.value == 2:
@@ -101,13 +122,16 @@ def placePiece(event, self, canvas):
 
 					else:
 						shortest = (9,9)
-		
+					#Chooses random point if there are several with the same distance from (9,9)
 					while True:
-						short = random.randint(0, len(tmpShortest))
+						short = random.randint(0, (len(tmpShortest)-1))
 						shortest = tmpShortest[short]
 						if board[shortest[0]][shortest[1]].value == 0:
 							break
 					
+					#Piece is placed, stored for future reference
+					#Generates monomials for placed piece and ranks monomials
+					# or next move
 					print(shortest)
 					placePiece(event, board[shortest[0]][shortest[1]], canvas)
 					session.lastComputerPosition = shortest
@@ -158,6 +182,9 @@ def placePiece(event, self, canvas):
 					print("tmpTop")
 					print(tmpTop)
 
+					#Piece is placed, stored for future reference
+					#Generates monomials for placed piece and ranks monomials
+					# or next move
 					print(nextPiece)
 					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
 					session.lastComputerPosition = nextPiece
@@ -172,10 +199,12 @@ def placePiece(event, self, canvas):
 					print(opponent_points)
 					
 			else:
+				#Visually places piece, sets session values for opponent
 				session.player = 1
 				self.value = 2
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			canvas.update()
+			#Checks if someone has won and displays winning message
 			if checkWin(self.index, self.value):
 				canvas.delete(session.title)
 				if self.value == 2:
@@ -185,6 +214,8 @@ def placePiece(event, self, canvas):
 				session.play = False
 			canvas.update()
 
+#Board is created, each board place is an object, default title is also place
+#Globoal variable is set to determine whether human or computer goes first
 def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 	session.humanFirst = option
 	for row in range(19):
@@ -204,6 +235,8 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 		canvas.create_line(x + 15, 85, x + 15, 626, fill = "black", width = 1)
 	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
 
+#Checks is a winning monomial has been created
+#Called from placePiece
 def checkWin(index, piece):
 	#Check horizontal
 	for i in range(4,-1,-1):
@@ -245,7 +278,7 @@ def checkWin(index, piece):
 		if occupied == 5:
 			return True
 
-
+#Generates monomials for specified point (tuple)
 def generateMonomials(index):
 
 	#Calculate horizontal monomials
@@ -284,12 +317,24 @@ def generateMonomials(index):
 		if len(tmpMonomial) == 5:
 			master_monomials.append(tmpMonomial)
 
+'''
+Helper function for rankPoints
+Determines whether a monomial is alive 
+based on whether any opposing pieces are present
+within
+'''
 def monomialDead(m, v):
 	for p in m:
 		if board[p[0]][p[1]].value == v:
 			return True
 	return False
 
+'''
+Helper function for rankPoints
+Determines the completion score of monomial,
+score increases at a larger rate depending on
+how many pieces are complete within the monomial
+'''
 def completionScore(m, v):
 	score = 1
 	
@@ -298,6 +343,12 @@ def completionScore(m, v):
 			score+=score
 	return (score - 2) 
 
+'''
+This function calculates the points for the computer
+and human monomials, from master_monomial list. Values
+are then transferred from dictionary to seperate lists and
+sorted for further use in placePiece
+'''
 def rankPoints():
 
 	#Clear list to update all monomials
@@ -308,6 +359,8 @@ def rankPoints():
 
 		#Check that monomial is not dead
 		if not monomialDead(m, 1):
+			#Calculate completion score and add it to corresponding
+			#areas of dictionary
 			completion = completionScore(m, 2)
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
@@ -342,9 +395,11 @@ def rankPoints():
 	for key in opponent_rank:
 		opponent_points.append([opponent_rank[key][0], key, opponent_rank[key][1]])
 
+	#Sort from greatest to least
 	ranked_points.sort(reverse = True)
 	opponent_points.sort(reverse = True)
 
+#Resets all data structures storing data and the canvas
 def resetData(canvas):
 	canvas.delete(ALL)
 	board.clear()
@@ -358,7 +413,12 @@ def resetData(canvas):
 	opponent_points.clear()
 	opponentPieces.clear()
 
-	
+'''
+First function that runs, creates menu and calls function to create
+the board, functions are called with different value depending on whether
+a human or computer is starting the game first, this can be altered, by 
+changing the game mode
+'''
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas, first):
 		session.hardReset()
