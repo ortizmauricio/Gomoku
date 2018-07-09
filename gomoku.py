@@ -41,7 +41,6 @@ def placePiece(event, self, canvas):
 				session.player = 2
 				self.value = 1
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
-				generateMonomials(self.index)
 				
 				#Computer's turn
 				if session.computerFirst == 0:
@@ -54,62 +53,14 @@ def placePiece(event, self, canvas):
 						session.lastComputerPosition = (9, 8)
 					placedPieces.append(session.lastComputerPosition)
 					rankPoints()
-					'''
-					print("Opponent points: ")
-					print(opponent_points)
-					'''
+
 				else:
 					generateMonomials(session.lastComputerPosition)
 					print("This is the length: ")
 					print(len(master_monomials))
 					rankPoints()
 
-					#Go by distance
-
-					#Check if I have open three or open four
-					#Prioritize completition
-
-
-					'''
-					print("Opponent points: ")
-					print(opponent_points)
-					
-					#Prioritize adjacency by calculating distance
-					#from previous point to top scoring points
-					#and altering score 
-					topScore = ranked_points[0][0]
-					tmpTop = []
-
-					print(opponent_points)
-					for i in ranked_points:
-						if i[0] == topScore:
-							tmpTop.append(i)
-
-					for i in tmpTop:
-						distance = math.sqrt(math.pow((session.lastComputerPosition[0]-i[1][0]),2) + math.pow((session.lastComputerPosition[1] - i[1][1]),2))
-						i[0]+=(4 - distance)
-
-					tmpTop.sort(reverse = True)
-			
-					#Check on opponent to block move if necessary
-					oppTop = []
-					for m in opponent_points:
-						if m[0] >= 12:
-							oppTop.append(m)
-
-
-
-					#If opponnent has no advantage or one move away from winning
-					if len(oppTop) == 0:
-						nextPiece = tmpTop[0][1]
-					else:
-						for p in oppTop:
-							if p[1] in point_rank:
-								p[0]+=point_rank[p[1]]
-						oppTop.sort(reverse = True)
-						nextPiece = oppTop[0][1]
-
-					'''
+	
 					print(ranked_points)
 					nextPiece = ranked_points[0][1]
 					print(nextPiece)
@@ -233,6 +184,7 @@ def monomialDead(m, v):
 
 def completionScore(m, v):
 	score = 1
+	
 	for p in m:
 		if board[p[0]][p[1]].value == v:
 			score+=score
@@ -242,42 +194,31 @@ def rankPoints():
 
 	#Clear list to update all monomials
 	point_rank.clear()
-	opponent_rank.clear()
 	#Go through all monomials for recalculation
 	for m in master_monomials:
 
 		#Check that monomial is not dead
 		if not monomialDead(m, 1):
+			completion = completionScore(m, 2)
 			for p in m:
-				completion = completionScore(m, 2)
 				if board[p[0]][p[1]].value == 0:
+					
 					if p not in point_rank:
-						point_rank[p] = [1, completion]
+						point_rank[p] = [1, 0]
 					else:
 						point_rank[p][0]+=1
 					point_rank[p][0]+=completion
 					point_rank[p][1]+=completion
-		if not monomialDead(m, 2):
-			for p in m:
-				if board[p[0]][p[1]].value == 0:
-					if p not in opponent_rank:
-						opponent_rank[p] = 1 + completionScore(m, 1)
-					else:
-						opponent_rank[p]+=1
-
+	
 
 	#Add to list for sorting
 	ranked_points.clear()
-	opponent_points.clear()
 
 	for key in point_rank:
 		ranked_points.append([point_rank[key][0], key, point_rank[key][1]])
 
-	for key in opponent_rank:
-		opponent_points.append([opponent_rank[key], key])
-
 	ranked_points.sort(reverse = True)
-	opponent_points.sort(reverse = True)
+
 
 	
 def run(width = session.width, height = session.height):
