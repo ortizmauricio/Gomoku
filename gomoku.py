@@ -42,6 +42,7 @@ def placePiece(event, self, canvas):
 				self.value = 1
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 				generateMonomials(self.index)
+				rankPoints()
 				#Computer's turn
 				if session.computerFirst == 0:
 					session.computerFirst = 1
@@ -52,22 +53,66 @@ def placePiece(event, self, canvas):
 						placePiece(event, board[9][8], canvas)
 						session.lastComputerPosition = (9, 8)
 					placedPieces.append(session.lastComputerPosition)
-					rankPoints()
-
-				else:
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
 
+				else:
+
+					#Go by distance
+
+					#Check if I have open three or open four
+					#Prioritize completition
+					
+					#Prioritize adjacency by calculating distance
+					#from previous point to top scoring points
+					#and altering score 
+					topScore = ranked_points[0][0]
+					tmpTop = []
+
+					for i in ranked_points:
+						if i[0] == topScore:
+							tmpTop.append(i)
+					for i in tmpTop:
+						distance = math.sqrt(math.pow((session.lastComputerPosition[0]-i[1][0]),2) + math.pow((session.lastComputerPosition[1] - i[1][1]),2))
+						i[0]+=(4 - distance)
+					tmpTop.sort(reverse = True)
+			
+					#Check on opponent to block move if necessary
+					oppTop = []
+					for m in opponent_points:
+				
+						if m[2] >= 40:
+							oppTop.append(m)
+					#If opponnent has no advantage or one move away from winning
+					if len(oppTop) == 0 or point_rank[tmpTop[0][1]][1]>=78:
+						nextPiece = tmpTop[0][1]
+					else:
+						for p in oppTop:
+							print(p)
+							if p[1] in point_rank:
+								print(point_rank[p[1]][0])
+								p[0]+=point_rank[p[1]][0]
+						oppTop.sort(reverse = True)
+						nextPiece = oppTop[0][1]
+					print("oppTop")
+					print(oppTop)
+					print("tmpTop")
+					print(tmpTop)
+
+					print(nextPiece)
+					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
+					session.lastComputerPosition = nextPiece
+
+					placedPieces.append(session.lastComputerPosition)
+
+
+
+					generateMonomials(session.lastComputerPosition)
+					rankPoints()
 					print("Ranked Points")
 					print(ranked_points)
 					print("opponent_points")
 					print(opponent_points)
-					nextPiece = ranked_points[0][1]
-					print(nextPiece)
-					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
-					session.lastComputerPosition = nextPiece
-					placedPieces.append(session.lastComputerPosition)
-		
 					
 			else:
 				session.player = 1
