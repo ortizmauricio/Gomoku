@@ -50,7 +50,7 @@ def placePiece(event, self, canvas):
 					else:
 						placePiece(event, board[9][8], canvas)
 						session.lastComputerPosition = (9, 8)
-					placedPieces.append(lastComputerPosition)
+					placedPieces.append(session.lastComputerPosition)
 					rankPoints()
 					'''
 					print("Opponent points: ")
@@ -111,7 +111,7 @@ def placePiece(event, self, canvas):
 					print(nextPiece)
 					placePiece(event, board[nextPiece[0]][nextPiece[1]], canvas )
 					session.lastComputerPosition = nextPiece
-					placedPieces.append(lastComputerPosition)
+					placedPieces.append(session.lastComputerPosition)
 		
 					
 			else:
@@ -232,7 +232,7 @@ def completionScore(m, v):
 	for p in m:
 		if board[p[0]][p[1]].value == v:
 			score+=score
-	return (score - 2)
+	return (score - 2) 
 
 def rankPoints():
 
@@ -245,19 +245,22 @@ def rankPoints():
 		#Check that monomial is not dead
 		if not monomialDead(m, 1):
 			for p in m:
+				completion = completionScore(m, 2)
 				if board[p[0]][p[1]].value == 0:
 					if p not in point_rank:
-						point_rank[p] = 1 + completionScore(m, 2)
+						point_rank[p] = 1
 					else:
 						point_rank[p]+=1
-
+					point_rank[p]+=completion
 		if not monomialDead(m, 2):
 			for p in m:
 				if board[p[0]][p[1]].value == 0:
+					completion = completionScore(m,1)
 					if p not in opponent_rank:
-						opponent_rank[p] = 1 + completionScore(m, 1)
+						opponent_rank[p] = 1
 					else:
 						opponent_rank[p]+=1
+					opponent_rank[p]+=completion
 
 
 	#Add to list for sorting
