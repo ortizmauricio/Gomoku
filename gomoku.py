@@ -124,8 +124,6 @@ def placePiece(event, self, canvas):
 
 					placedPieces.append(session.lastComputerPosition)
 
-
-
 					generateMonomials(session.lastComputerPosition)
 					rankPoints()
 					print("Ranked Points")
@@ -139,7 +137,6 @@ def placePiece(event, self, canvas):
 				self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			canvas.update()
 			if checkWin(self.index, self.value):
-				print("Player ", self.value, " wins!")
 				canvas.delete(session.title)
 				if self.value == 2:
 					session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
