@@ -31,7 +31,7 @@ class Game:
 	def __init__(self):
 		self.play = True
 		self.player = 1
-		self.width = 650
+		self.width = 670
 		self.height = 700
 		self.computerFirst = 0
 		self.lastComputerPosition = 0
@@ -57,7 +57,7 @@ class boardPlace:
 		self.y = y
 		self.value = 0
 		self.index = index
-		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1")
+		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
 		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
@@ -123,11 +123,13 @@ def placePiece(event, self, canvas):
 					else:
 						shortest = (9,9)
 					#Chooses random point if there are several with the same distance from (9,9)
-					while True:
-						short = random.randint(0, (len(tmpShortest)-1))
-						shortest = tmpShortest[short]
-						if board[shortest[0]][shortest[1]].value == 0:
-							break
+					
+					if len(tmpShortest) != 0:
+						while True:
+							short = random.randint(0, (len(tmpShortest)-1))
+							shortest = tmpShortest[short]
+							if board[shortest[0]][shortest[1]].value == 0:
+								break
 					
 					#Piece is placed, stored for future reference
 					#Generates monomials for placed piece and ranks monomials
@@ -220,19 +222,20 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 	session.humanFirst = option
 	for row in range(19):
 		x = 10
-		y+=30
+		y+=31
 
 		board.append([])
 		for col in range(19):
 			x+=30
 			board[row].append(boardPlace(x, y, canvas, (row, col)))
+			x+=1
 				
-		canvas.create_line(55, y + 15, 595, y + 15,fill = "black", width = 1)
+		canvas.create_line(55, y + 15, 615, y + 15,fill = "black", width = 1)
 
 	x = 10
 	for col in range(19):
-		x+=30
-		canvas.create_line(x + 15, 85, x + 15, 626, fill = "black", width = 1)
+		x+=31
+		canvas.create_line(x + 15, 85, x + 15, 645, fill = "black", width = 1)
 	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
 
 #Checks is a winning monomial has been created
