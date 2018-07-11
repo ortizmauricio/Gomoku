@@ -4,7 +4,7 @@ This source code is written in Python and uses Tkinter to create a GUI. Gomoku i
 The game has two modes, that determine whether the user or machine takes the first turn
 
 ## How it works
-This program takes a monomial calculation approach. For every piece that is place, all possible sets of length 5, which contain the selected piece, are generated and stored since it is necessary to complete one of those sets to win the game. 
+This program takes a monomial calculation approach. For every piece that is placed, all possible sets of length 5, which contain the selected piece, are generated and stored since it is necessary to complete one of those sets to win the game. 
 
 Every set is distinguished as a favorable or unfavorable set. All points that occur in the sets are then ranked based on their overall occurrence. Each point also receives a completion scored, which is determined based on the completition of the sets that they are part of.
 
