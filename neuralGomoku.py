@@ -58,8 +58,25 @@ class boardPlace:
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
-		#canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
+		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
+def placePiece(event, self, canvas):
+	if session.play:
+		if session.player == 1:
+			session.player = 2
+			print(session.player)
+		else:
+			session.player = 1
+			print(session.player)
+
+
+#Initializes board place scores based on monomials
+def setIntialBoardPlaceScores(board):
+	for row in range(19):
+		for col in range(19):
+			for point in master_monomials:
+				if board[row][col].index in point.boardPoints:
+					board[row][col].score += 1
 
 #Populates master_monomials with monomial objects
 def createMasterMonomials(monomials):
@@ -145,6 +162,7 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
 
 	createMasterMonomials(monomials)
+	setIntialBoardPlaceScores(board)
 
 
 #Resets all data structures storing data and the canvas
