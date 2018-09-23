@@ -216,7 +216,7 @@ def placePiece(event, self, canvas):
 				session.play = False
 			canvas.update()
 
-#Board is created, each board place is an object, default title is also place
+#Board is created, each board place is an object, default title is also placed
 #Globoal variable is set to determine whether human or computer goes first
 def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 	session.humanFirst = option
