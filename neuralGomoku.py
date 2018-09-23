@@ -36,7 +36,7 @@ session = Game()
 
 
 class Monomial:
-	def __init__():
+	def __init__(self):
 		self.score = 0;
 		self.boardPoints =[]
 		self.isAlive = True
@@ -54,61 +54,74 @@ class boardPlace:
 		self.y = y
 		self.index = index
 
-
-
 		self.score = 0
-		self.monomials = []
-
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
 		#canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
 
+#Populates master_monomials with monomial objects
+def createMasterMonomials(monomials):
+	noDuplicates = []
+
+	for monomial in monomials:
+		if monomial not in noDuplicates:
+			noDuplicates.append(monomial)
+
+	for monomial in noDuplicates:
+		tmpMonomial = Monomial()
+		tmpMonomial.boardPoints = monomial
+		master_monomials.append(tmpMonomial)
+
 
 #Generates monomials for specified point (tuple)
 def generateMonomials(index):
-
+	monomials = []
 	#Calculate horizontal monomials
 	for i in range(4,-1,-1):
-		tmpMonomial = Monomial()
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[1] - i + j>= 0 and index[1] - i + j < 19:
-				tmpMonomial.boardPoints.append((index[0],  index[1] - i + j))
-		if len(tmpMonomial.boardPoints) == 5:
-			master_monomials.append(tmpMonomial)
+				tmpMonomial.append((index[0],  index[1] - i + j))
+		if len(tmpMonomial) == 5:
+			monomials.append(tmpMonomial)
 
 	#Calculate vertifcal monomials
 	for i in range(4,-1,-1):
-		tmpMonomial = Monomial()
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19:
-				tmpMonomial.boardPoints.append((index[0] - i + j, index[1]))
+				tmpMonomial.append((index[0] - i + j, index[1]))
 		if len(tmpMonomial) == 5:
-			master_monomials.append(tmpMonomial)
+			monomials.append(tmpMonomial)
 
 	#Calculate right diagonal monomials
 	for i in range(4,-1,-1):
-		tmpMonomial = Monomial()
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
-				tmpMonomial.boardPoints.append((index[0] - i + j,index[1] - i + j))
+				tmpMonomial.append((index[0] - i + j,index[1] - i + j))
 		if len(tmpMonomial) == 5:
-			master_monomials.append(tmpMonomial)
+			monomials.append(tmpMonomial)
 
 	#Calculate left diagonal monomials
 	for i in range(4,-1,-1):
-		tmpMonomial = Monomial()
+		tmpMonomial = []
 		for j in range(0,5):
 			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
-				tmpMonomial.boardPoints.append((index[0] - i + j, index[1] + i - j))
+				tmpMonomial.append((index[0] - i + j, index[1] + i - j))
 		if len(tmpMonomial) == 5:
-			master_monomials.append(tmpMonomial)
+			monomials.append(tmpMonomial)
+
+	return monomials
+ 
 
 #Board is created, each board place is an object, default title is also placed
 #Globoal variable is set to determine whether human or computer goes first
 def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 	session.humanFirst = option
+	monomials =[]
 	for row in range(19):
 		x = 10
 		y+=31
@@ -116,6 +129,10 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 		board.append([])
 		for col in range(19):
 			x+=30
+
+			monomials = generateMonomials((row, col)) + monomials
+
+			#First layer creation
 			board[row].append(boardPlace(x, y, canvas, (row, col)))
 			x+=1
 				
@@ -126,6 +143,8 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 		x+=31
 		canvas.create_line(x + 15, 85, x + 15, 645, fill = "black", width = 1)
 	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
+
+	createMasterMonomials(monomials)
 
 
 #Resets all data structures storing data and the canvas
