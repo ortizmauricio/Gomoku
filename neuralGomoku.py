@@ -22,6 +22,7 @@ class Game:
 		self.lastComputerPosition = 0
 		self.title = 0
 		self.humanFirst = True
+		self.size = 5
 
 	def hardReset(self):
 		self.play = True
@@ -73,7 +74,17 @@ def updateMonomials(index):
 		for monomial in computer_monomials:
 			if index in monomial.boardPoints:
 				monomial.isAlive = False
+		session.size -= 1
+	else:
+		for monomial in computer_monomials:
+			if monomial.isAlive:
+				if index in monomial.boardPoints:
+					monomial.score *= 2
+					monomial.boardPoints.remove(index)
 
+		for monomial in opponent_monomials:
+			if index in monomial.boardPoints:
+				monomial.isAlive = False
 
 
 
