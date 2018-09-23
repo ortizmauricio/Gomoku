@@ -43,11 +43,15 @@ class Monomial:
 		self.boardPoints =[]
 		self.isAlive = True
 
-	def changePointValues(self):
-		return
-	def updateMonomial(self):
-		return
-
+	def increment(self):
+		for point in board:
+			if point.index in self.boardPoints:
+				point.score += (self.score) - (self.score/2)
+	
+	def decrement(self):
+		for point in board:
+			if point.index in self.boardPoints:
+				point.score -= self.score 
 
 #Board place object that calls place piece on click
 class boardPlace:
@@ -70,21 +74,25 @@ def updateMonomials(index):
 				if index in monomial.boardPoints:
 					monomial.score *= 2
 					monomial.boardPoints.remove(index)
+					monomial.increment()
 
 		for monomial in computer_monomials:
 			if index in monomial.boardPoints:
 				monomial.isAlive = False
-		session.size -= 1
+				monomial.decrement()
+		session.size -=1
 	else:
 		for monomial in computer_monomials:
 			if monomial.isAlive:
 				if index in monomial.boardPoints:
 					monomial.score *= 2
 					monomial.boardPoints.remove(index)
+					monomial.increment()
 
 		for monomial in opponent_monomials:
 			if index in monomial.boardPoints:
 				monomial.isAlive = False
+				monomial.decrement()
 
 
 
@@ -95,7 +103,7 @@ def placePiece(event, self, canvas):
 			updateMonomials(self.index)
 			for monomial in opponent_monomials:
 				if len(monomial.boardPoints) == session.size:
-					print(monomial.boardPoints)
+					print(monomial.boardPoints, monomial.score)
 
 			session.player = 2
 			print(session.player)
