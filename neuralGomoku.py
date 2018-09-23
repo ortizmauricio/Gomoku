@@ -42,10 +42,9 @@ class Monomial:
 		self.isAlive = True
 
 	def changePointValues(self):
-		print "hello"
-
+		return
 	def updateMonomial(self):
-		print "hello"
+		return
 
 
 #Board place object that calls place piece on click
@@ -64,6 +63,47 @@ class boardPlace:
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
 		#canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
+
+
+
+#Generates monomials for specified point (tuple)
+def generateMonomials(index):
+
+	#Calculate horizontal monomials
+	for i in range(4,-1,-1):
+		tmpMonomial = Monomial()
+		for j in range(0,5):
+			if index[1] - i + j>= 0 and index[1] - i + j < 19:
+				tmpMonomial.boardPoints.append((index[0],  index[1] - i + j))
+		if len(tmpMonomial.boardPoints) == 5:
+			master_monomials.append(tmpMonomial)
+
+	#Calculate vertifcal monomials
+	for i in range(4,-1,-1):
+		tmpMonomial = Monomial()
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19:
+				tmpMonomial.boardPoints.append((index[0] - i + j, index[1]))
+		if len(tmpMonomial) == 5:
+			master_monomials.append(tmpMonomial)
+
+	#Calculate right diagonal monomials
+	for i in range(4,-1,-1):
+		tmpMonomial = Monomial()
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] - i + j >= 0 and index[1] - i + j < 19:
+				tmpMonomial.boardPoints.append((index[0] - i + j,index[1] - i + j))
+		if len(tmpMonomial) == 5:
+			master_monomials.append(tmpMonomial)
+
+	#Calculate left diagonal monomials
+	for i in range(4,-1,-1):
+		tmpMonomial = Monomial()
+		for j in range(0,5):
+			if index[0] - i + j >= 0 and index[0] - i + j < 19 and index[1] + i - j >= 0 and index[1] + i - j < 19:
+				tmpMonomial.boardPoints.append((index[0] - i + j, index[1] + i - j))
+		if len(tmpMonomial) == 5:
+			master_monomials.append(tmpMonomial)
 
 #Board is created, each board place is an object, default title is also placed
 #Globoal variable is set to determine whether human or computer goes first
