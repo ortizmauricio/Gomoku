@@ -7,7 +7,8 @@ random.seed()
 board =[]
 
 #Monomials from human and computer
-master_monomials = []
+computer_monomials = []
+opponent_monomials = []
 
 
 #Contains and controls variables important for game session
@@ -60,21 +61,47 @@ class boardPlace:
 
 		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
+
+def updateMonomials(index):
+	if session.player == 1:
+		for monomial in opponent_monomials:
+			if monomial.isAlive:
+				if index in monomial.boardPoints:
+					monomial.score *= 2
+					monomial.boardPoints.remove(index)
+
+		for monomial in computer_monomials:
+			if index in monomial.boardPoints:
+				monomial.isAlive = False
+
+
+
+
 def placePiece(event, self, canvas):
 	if session.play:
 		if session.player == 1:
+			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+			updateMonomials(self.index)
+			for monomial in opponent_monomials:
+				if len(monomial.boardPoints) == session.size:
+					print(monomial.boardPoints)
+
 			session.player = 2
 			print(session.player)
 		else:
+			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			session.player = 1
 			print(session.player)
+
+
+	canvas.update()
 
 
 #Initializes board place scores based on monomials
 def setIntialBoardPlaceScores(board):
 	for row in range(19):
 		for col in range(19):
-			for point in master_monomials:
+			for point in opponent_monomials:
 				if board[row][col].index in point.boardPoints:
 					board[row][col].score += 1
 
@@ -88,8 +115,13 @@ def createMasterMonomials(monomials):
 
 	for monomial in noDuplicates:
 		tmpMonomial = Monomial()
+		tmpMonomial2 = Monomial()
 		tmpMonomial.boardPoints = monomial
-		master_monomials.append(tmpMonomial)
+		tmpMonomial2.boardPoints = monomial
+		computer_monomials.append(tmpMonomial)
+		opponent_monomials.append(tmpMonomial2)
+	print(len(computer_monomials))
+	print(len(opponent_monomials))
 
 
 #Generates monomials for specified point (tuple)
@@ -169,7 +201,8 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 def resetData(canvas):
 	canvas.delete(ALL)
 	board.clear()
-	master_monomials.clear()
+	computer_monomials.clear()
+	opponent_monomials.clear()
 
 
 '''
