@@ -59,7 +59,7 @@ class boardPlace:
 		self.x = x
 		self.y = y
 		self.index = index
-
+		self.occupied = False;
 		self.score = 0
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
@@ -94,24 +94,53 @@ def updateMonomials(index):
 				monomial.isAlive = False
 				monomial.decrement()
 
+def boardAnalysis():
+	rankedMonomials = []
+	for monomial in computer_monomials:
+		if monomial.isAlive:
+			rankedMonomials.append((monomial.score, monomial.boardPoints))
 
+	rankedMonomials.sort(reverse = True)
+
+	point = rankedMonomials[0][1][0]
+	highest = board[point[0]][point[1]].score
+	for point in rankedMonomials[0][1]:
+		if board[point[0]][point[1]].score > highest:
+			highest = point
+
+	for point in rankedMonomials[0][1]:
+		print(point)
+	print("highest is ", highest)
+	
+	print(point)
+	return point
 
 def placePiece(event, self, canvas):
 	if session.play:
-		if session.player == 1:
+		if session.player == 1 and self.occupied == False:
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+			self.occupied = True
 			updateMonomials(self.index)
+			'''
 			for monomial in opponent_monomials:
 				if len(monomial.boardPoints) == session.size:
 					print(monomial.boardPoints, monomial.score)
-
-			session.player = 2
+			'''
+			
 			print(session.player)
+			calculatedPoint = boardAnalysis()
+			print("point is ", calculatedPoint)
+			point = board[calculatedPoint[0]][calculatedPoint[1]]
+			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
+			point.occupied = True
+			updateMonomials(point.index)
+	'''
 		else:
+			calcualtedPoint = boardAnalysis()
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			session.player = 1
 			print(session.player)
-
+	'''
 
 	canvas.update()
 
