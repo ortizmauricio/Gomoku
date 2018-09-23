@@ -35,14 +35,32 @@ class Game:
 session = Game()
 
 
+class Monomial:
+	def __init__():
+		self.score = 0;
+		self.boardPoints =[]
+		self.isAlive = True
+
+	def changePointValues(self):
+		print "hello"
+
+	def updateMonomial(self):
+		print "hello"
+
 
 #Board place object that calls place piece on click
 class boardPlace:
 	def __init__(self, x, y, canvas, index):
 		self.x = x
 		self.y = y
-		self.value = 0
 		self.index = index
+
+
+
+		self.score = 0
+		self.monomials = []
+
+
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
 		#canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
