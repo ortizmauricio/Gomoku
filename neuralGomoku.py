@@ -37,7 +37,7 @@ session = Game()
 
 class Monomial:
 	def __init__(self):
-		self.score = 0;
+		self.score = 1;
 		self.boardPoints =[]
 		self.isAlive = True
 
