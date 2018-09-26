@@ -44,14 +44,29 @@ class Monomial:
 		self.isAlive = True
 
 	def increment(self):
-		for point in board:
-			if point.index in self.boardPoints:
-				point.score += (self.score) - (self.score/2)
+		self.score *= 2
+		if session.player == 1:
+			for row in range(19):
+				for col in range(19):
+					if board[row][col].index in self.boardPoints:
+						board[row][col].oppScoreIncrement(self.score)			
+		else:
+			for row in range(19):
+				for col in range(19):
+					if board[row][col].index in self.boardPoints:
+						board[row][col].comScoreIncrement(self.score)
 	
 	def decrement(self):
-		for point in board:
-			if point.index in self.boardPoints:
-				point.score -= self.score 
+		if session.player == 1:
+			for row in range(19):
+				for col in range(19):
+					if board[row][col].index in self.boardPoints:
+						board[row][col].comScoreDecrement(self.score)
+		else:
+			for row in range(19):
+				for col in range(19):
+					if board[row][col].index in self.boardPoints:
+						board[row][col].oppScoreDecrement(self.score)
 
 #Board place object that calls place piece on click
 class boardPlace:
@@ -60,80 +75,110 @@ class boardPlace:
 		self.y = y
 		self.index = index
 		self.occupied = False;
-		self.score = 0
+		self.comScore = 0
+		self.oppScore = 0
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
 		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
 
 
+	def oppScoreIncrement(self, score):
+		self.oppScore += (score) - (score/2)
+
+	def comScoreIncrement(self, score):
+		self.comScore += (score) - (score/2)
+
+	def oppScoreDecrement(self, score):
+		self.oppScore -= score
+
+	def comScoreDecrement(self, score):
+		self.comScore -= score
+
+
 def updateMonomials(index):
 	if session.player == 1:
+		print("Incrementing opponent and decrementing computer")
 		for monomial in opponent_monomials:
 			if monomial.isAlive:
 				if index in monomial.boardPoints:
-					monomial.score *= 2
 					monomial.boardPoints.remove(index)
 					monomial.increment()
-
 		for monomial in computer_monomials:
 			if index in monomial.boardPoints:
 				monomial.isAlive = False
 				monomial.decrement()
 		session.size -=1
 	else:
+		print("Incrementing computer and decrementing opponent")
 		for monomial in computer_monomials:
 			if monomial.isAlive:
 				if index in monomial.boardPoints:
-					monomial.score *= 2
 					monomial.boardPoints.remove(index)
 					monomial.increment()
-
 		for monomial in opponent_monomials:
 			if index in monomial.boardPoints:
 				monomial.isAlive = False
 				monomial.decrement()
 
-def boardAnalysis():
-	rankedMonomials = []
-	for monomial in computer_monomials:
+def firstLayerReflexive():
+	urgentMonomials = []
+	for monomial in opponent_monomials:
 		if monomial.isAlive:
-			rankedMonomials.append((monomial.score, monomial.boardPoints))
+			if len(monomial.boardPoints) < 3:
+				urgentMonomials.append(monomial)
+	return urgentMonomials
 
-	rankedMonomials.sort(reverse = True)
+def boardAnalysis():
 
-	point = rankedMonomials[0][1][0]
-	highest = board[point[0]][point[1]].score
-	for point in rankedMonomials[0][1]:
-		if board[point[0]][point[1]].score > highest:
-			highest = point
+	openThreeOrClosedFour = firstLayerReflexive()
+	rankedPoints = []
+	topScoring = []
 
-	for point in rankedMonomials[0][1]:
-		print(point)
-	print("highest is ", highest)
-	
-	print(point)
-	return point
+	if not openThreeOrClosedFour:
+		for monomial in computer_monomials:
+			if monomial.isAlive == True:
+				for point in monomial.boardPoints:
+					if (board[point[0]][point[1]].comScore, point) not in rankedPoints:
+						rankedPoints.append((board[point[0]][point[1]].comScore, point))
+	else:
+		for monomial in openThreeOrClosedFour:
+			for point in monomial.boardPoints:
+					if (board[point[0]][point[1]].oppScore, point) not in rankedPoints:
+						rankedPoints.append((board[point[0]][point[1]].oppScore, point))
+		print(rankedPoints)
+
+	rankedPoints.sort(reverse = True)
+
+	maxScore = rankedPoints[0][0]
+	for point in rankedPoints:
+		if point[0] == maxScore:
+			topScoring.append(point)
+
+	choice = random.randint(0, (len(topScoring) - 1))
+	print(topScoring)
+	return topScoring[choice][1]
+
 
 def placePiece(event, self, canvas):
 	if session.play:
 		if session.player == 1 and self.occupied == False:
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 			self.occupied = True
+
 			updateMonomials(self.index)
-			'''
-			for monomial in opponent_monomials:
-				if len(monomial.boardPoints) == session.size:
-					print(monomial.boardPoints, monomial.score)
-			'''
-			
-			print(session.player)
+
+			session.player = 2
+				
+
 			calculatedPoint = boardAnalysis()
 			print("point is ", calculatedPoint)
 			point = board[calculatedPoint[0]][calculatedPoint[1]]
 			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
 			point.occupied = True
 			updateMonomials(point.index)
+
+			session.player = 1
 	'''
 		else:
 			calcualtedPoint = boardAnalysis()
@@ -151,7 +196,8 @@ def setIntialBoardPlaceScores(board):
 		for col in range(19):
 			for point in opponent_monomials:
 				if board[row][col].index in point.boardPoints:
-					board[row][col].score += 1
+					board[row][col].comScore += 1
+					board[row][col].oppScore += 1
 
 #Populates master_monomials with monomial objects
 def createMasterMonomials(monomials):
