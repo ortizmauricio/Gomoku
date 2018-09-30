@@ -1,6 +1,6 @@
 #Program starts running at run() function
 from tkinter import *
-import random, math
+import random, math, copy
 random.seed()
 
 #All board objects
@@ -42,6 +42,9 @@ class Monomial:
 		self.score = 1;
 		self.boardPoints =[]
 		self.isAlive = True
+
+	def kill(self):
+		self.isAlive = False
 
 	def increment(self):
 		self.score *= 2
@@ -105,8 +108,10 @@ def updateMonomials(index):
 					monomial.boardPoints.remove(index)
 					monomial.increment()
 		for monomial in computer_monomials:
+			if(len(monomial.boardPoints) < 5):
+				print(monomial.boardPoints)
 			if index in monomial.boardPoints:
-				monomial.isAlive = False
+				monomial.kill()
 				monomial.decrement()
 		session.size -=1
 	else:
@@ -118,16 +123,39 @@ def updateMonomials(index):
 					monomial.increment()
 		for monomial in opponent_monomials:
 			if index in monomial.boardPoints:
-				monomial.isAlive = False
+				monomial.kill()
 				monomial.decrement()
 
-def firstLayerReflexive():
+
+def openThree():
 	urgentMonomials = []
 	for monomial in opponent_monomials:
 		if monomial.isAlive:
-			if len(monomial.boardPoints) < 3:
+			if len(monomial.boardPoints) == 2:
 				urgentMonomials.append(monomial)
 	return urgentMonomials
+
+def closedFour():
+	urgentMonomials = []
+	for monomial in opponent_monomials:
+		if monomial.isAlive:
+			if len(monomial.boardPoints) == 1:
+				print("This closed four monomial is alive", monomial.boardPoints)
+				urgentMonomials.append(monomial)
+	return urgentMonomials
+
+def firstLayerReflexive():
+	urgentMonomials = []
+	urgentMonomials = closedFour()
+
+	if not urgentMonomials:
+		print("We are checking for an open three")
+		urgentMonomials = openThree()
+
+	print("These are the urgent monomials ")
+	for monomial in urgentMonomials:
+		print(monomial.boardPoints, monomial.isAlive)
+	return urgentMonomials	
 
 def boardAnalysis():
 
@@ -211,7 +239,7 @@ def createMasterMonomials(monomials):
 		tmpMonomial = Monomial()
 		tmpMonomial2 = Monomial()
 		tmpMonomial.boardPoints = monomial
-		tmpMonomial2.boardPoints = monomial
+		tmpMonomial2.boardPoints = copy.deepcopy(monomial)
 		computer_monomials.append(tmpMonomial)
 		opponent_monomials.append(tmpMonomial2)
 	print(len(computer_monomials))
