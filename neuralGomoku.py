@@ -215,10 +215,11 @@ def placePiece(event, self, canvas):
 
 			updateMonomials(self.index)
 			print("Point placed at ", self.index)
+			if checkWin(canvas):
+				session.play = False
+				return
 
-			session.player = 2
-				
-
+			session.player = 2				
 			if session.humanFirst:
 				session.humanFirst = False
 				calculatedPoint = computerNearOpponent(self)
@@ -230,6 +231,9 @@ def placePiece(event, self, canvas):
 			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
 			point.occupied = True
 			updateMonomials(point.index)
+			if checkWin(canvas):
+				session.play = False
+				return
 
 			session.player = 1
 		else:
@@ -241,6 +245,28 @@ def placePiece(event, self, canvas):
 	canvas.update()
 
 
+#Checks for win and displays message
+def checkWin(canvas):
+	win = False
+	if session.player == 1:
+		for monomial in opponent_monomials:
+			if len(monomial.boardPoints) == 0:
+				win = True
+				break
+	else:
+		for monomial in computer_monomials:
+			if len(monomial.boardPoints) == 0:
+				win = True
+				break
+
+	if win:
+		canvas.delete(session.title)
+		if session.player == 1:
+			session.title = canvas.create_text(session.width/2, 40, text="Human Wins!", fill="white", font="Helvetica 40 bold ")
+		else:
+			session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
+	canvas.update()
+	return win
 #Initializes board place scores based on monomials
 def setIntialBoardPlaceScores(board):
 	for row in range(19):
