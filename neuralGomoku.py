@@ -184,22 +184,47 @@ def boardAnalysis():
 			topScoring.append(point)
 
 	choice = random.randint(0, (len(topScoring) - 1))
-	print(topScoring)
 	return topScoring[choice][1]
+
+def computerNearOpponent(self):
+	initialMoves = []
+	for row in range(2):
+		for col in range(2):
+			if (self.index[0] + 1 - row) < 19 and (self.index[0] + 1 - row) >= 0  and (self.index[1] + 1 - col) < 19 and (self.index[1] + 1 - col) >= 0:
+				if not self.index == (self.index[0] + 1 - row, self.index[1] + 1 - col):
+					initialMoves.append((self.index[0] + 1 - row, self.index[1] + 1 - col))
+
+	choice = random.randint(0, (len(initialMoves) - 1))
+	print(initialMoves)
+	return initialMoves[choice]
+
+def computerInitialMove(canvas):
+	session.player = 2
+	calculatedPoint = boardAnalysis()
+	print("The chosen point is ", calculatedPoint )
+	event = 0
+	placePiece(event, board[calculatedPoint[0]][calculatedPoint[1]], canvas)
 
 
 def placePiece(event, self, canvas):
 	if session.play:
+		print("We entered the function")
 		if session.player == 1 and self.occupied == False:
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 			self.occupied = True
 
 			updateMonomials(self.index)
+			print("Point placed at ", self.index)
 
 			session.player = 2
 				
 
-			calculatedPoint = boardAnalysis()
+			if session.humanFirst:
+				session.humanFirst = False
+				calculatedPoint = computerNearOpponent(self)
+			else:
+				calculatedPoint = boardAnalysis()
+
 			print("point is ", calculatedPoint)
 			point = board[calculatedPoint[0]][calculatedPoint[1]]
 			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
@@ -207,14 +232,12 @@ def placePiece(event, self, canvas):
 			updateMonomials(point.index)
 
 			session.player = 1
-	'''
 		else:
-			calcualtedPoint = boardAnalysis()
+			print("We entered this part of the function")
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
+			self.occupied = True
+			updateMonomials(self.index)
 			session.player = 1
-			print(session.player)
-	'''
-
 	canvas.update()
 
 
@@ -341,6 +364,7 @@ def run(width = session.width, height = session.height):
 			createBoard(canvas, True)
 		else:
 			createBoard(canvas, False)
+			computerInitialMove(canvas)
 		canvas.update()
 
 	root = Tk()
