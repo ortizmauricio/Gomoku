@@ -127,11 +127,27 @@ def updateMonomials(index):
 				monomial.decrement()
 
 
+def openThreeOffensive():
+	urgentMonomials = []
+	for monomial in computer_monomials:
+		if monomial.isAlive:
+			if len(monomial.boardPoints) <= 2:
+				urgentMonomials.append(monomial)
+	return urgentMonomials
+
+def openFourOffensive():
+	urgentMonomials = []
+	for monomial in computer_monomials:
+		if monomial.isAlive:
+			if len(monomial.boardPoints) == 1:
+				urgentMonomials.append(monomial)
+	return urgentMonomials
+
 def openThree():
 	urgentMonomials = []
 	for monomial in opponent_monomials:
 		if monomial.isAlive:
-			if len(monomial.boardPoints) == 2:
+			if len(monomial.boardPoints) <= 2:
 				urgentMonomials.append(monomial)
 	return urgentMonomials
 
@@ -144,10 +160,24 @@ def closedFour():
 				urgentMonomials.append(monomial)
 	return urgentMonomials
 
+def firstLayerReflexiveOffensive():
+	urgentMonomials = []
+	urgentMonomials = openFourOffensive()
+	
+	if not urgentMonomials:
+		print("We are checking for an open three")
+		urgentMonomials = openThreeOffensive()
+
+	print("These are the urgent monomials ")
+	for monomial in urgentMonomials:
+		print(monomial.boardPoints, monomial.isAlive)
+	return urgentMonomials	
+
+
 def firstLayerReflexive():
 	urgentMonomials = []
 	urgentMonomials = closedFour()
-
+	
 	if not urgentMonomials:
 		print("We are checking for an open three")
 		urgentMonomials = openThree()
@@ -158,12 +188,17 @@ def firstLayerReflexive():
 	return urgentMonomials	
 
 def boardAnalysis():
-
+	openThreeOrOpenFourOffensive = firstLayerReflexiveOffensive()
 	openThreeOrClosedFour = firstLayerReflexive()
 	rankedPoints = []
 	topScoring = []
 
-	if not openThreeOrClosedFour:
+	if openThreeOrOpenFourOffensive:
+		for monomial in openThreeOrOpenFourOffensive:
+			for point in monomial.boardPoints:
+					if (board[point[0]][point[1]].comScore, point) not in rankedPoints:
+						rankedPoints.append((board[point[0]][point[1]].oppScore, point))
+	elif not openThreeOrClosedFour:
 		for monomial in computer_monomials:
 			if monomial.isAlive == True:
 				for point in monomial.boardPoints:
