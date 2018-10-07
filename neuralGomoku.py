@@ -115,7 +115,6 @@ def updateMonomials(index):
 			if index in monomial.boardPoints:
 				monomial.kill()
 				monomial.decrement()
-		session.size -=1
 	else:
 		print("Incrementing computer and decrementing opponent")
 		for monomial in computer_monomials:
@@ -433,18 +432,17 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 
 #Undo previous move
 def undo(canvas,mylist):
-	print("This button works")
-	print(moves)
 	if moves:
-		print("We entered moves")
 		index = moves[len(moves) - 1]
-		canvas.delete(board[index[0]][index[1]].visual)
+		canvas.delete(board[index[0]][index[1]].mark)
 		canvas.update()
 
 
+
 #Resets all data structures storing data and the canvas
-def resetData(canvas):
+def resetData(canvas, mylist):
 	canvas.delete(ALL)
+	mylist.delete(0, END)
 	board.clear()
 	computer_monomials.clear()
 	opponent_monomials.clear()
@@ -459,7 +457,7 @@ changing the game mode
 def run(width = session.width, height = session.height):
 	def createBoardWrapper(canvas, mylist, first):
 		session.hardReset()
-		resetData(canvas)
+		resetData(canvas, mylist)
 		if first == 1:
 			createBoard(canvas, mylist, True)
 		else:
@@ -476,7 +474,7 @@ def run(width = session.width, height = session.height):
 	mylist.pack( side = LEFT, fill = BOTH )
 	scrollbar.config( command = mylist.yview )
 
-	canvas = Canvas(root, width = width, height = height, background = "white")
+	canvas = Canvas(root, width = width, height = height, background = "grey")
 	canvas.pack()
 
 
