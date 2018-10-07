@@ -10,6 +10,8 @@ board =[]
 computer_monomials = []
 opponent_monomials = []
 
+#Moves in chronological order
+moves = []
 
 #Contains and controls variables important for game session
 class Game:
@@ -261,7 +263,8 @@ def placePiece(event, self, canvas, mylist):
 
 			updateMonomials(self.index)
 			print("Point placed at ", self.index)
-			updateList(session.player, mylist, self.index)
+			moves.append(self.index)
+			updateList(session.player, mylist, moves[len(moves) - 1])
 			if checkWin(canvas):
 				session.play = False
 				return
@@ -281,14 +284,16 @@ def placePiece(event, self, canvas, mylist):
 			if checkWin(canvas):
 				session.play = False
 				return
-			updateList(session.player, mylist, calculatedPoint)
+			moves.append(calculatedPoint)
+			updateList(session.player, mylist, moves[len(moves) - 1])
 			session.player = 1
 		else:
 			print("We entered this part of the function")
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			self.occupied = True
 			updateMonomials(self.index)
-			updateList(session.player, mylist, self.index)
+			moves.append(self.index)
+			updateList(session.player, mylist, moves[len(moves) - 1])
 			session.player = 1
 	canvas.update()
 	mylist.update()
@@ -399,6 +404,7 @@ def generateMonomials(index):
 def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 	session.humanFirst = option
 	monomials =[]
+
 	for row in range(19):
 		x = 10
 		y+=31
@@ -420,9 +426,20 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 		x+=31
 		canvas.create_line(x + 15, 85, x + 15, 645, fill = "black", width = 1)
 	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
-
 	createMasterMonomials(monomials)
 	setIntialBoardPlaceScores(board)
+
+
+
+#Undo previous move
+def undo(canvas,mylist):
+	print("This button works")
+	print(moves)
+	if moves:
+		print("We entered moves")
+		index = moves[len(moves) - 1]
+		canvas.delete(board[index[0]][index[1]].visual)
+		canvas.update()
 
 
 #Resets all data structures storing data and the canvas
@@ -459,14 +476,14 @@ def run(width = session.width, height = session.height):
 	mylist.pack( side = LEFT, fill = BOTH )
 	scrollbar.config( command = mylist.yview )
 
-	canvas = Canvas(root, width = width, height = height, background = "grey")
+	canvas = Canvas(root, width = width, height = height, background = "white")
 	canvas.pack()
-
 
 
 	createBoardWrapper(canvas, mylist, 1)
 
-
+	button = Button(root,text = "Undo", command =  lambda: undo(canvas, mylist))
+	button.pack()
 
 	menubar = Menu(root)
 
