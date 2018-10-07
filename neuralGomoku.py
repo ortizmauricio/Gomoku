@@ -9,6 +9,7 @@ board =[]
 #Monomials from human and computer
 computer_monomials = []
 opponent_monomials = []
+masterMonomials = []
 
 #Moves in chronological order
 moves = []
@@ -262,8 +263,8 @@ def placePiece(event, self, canvas, mylist):
 
 			updateMonomials(self.index)
 			print("Point placed at ", self.index)
-			moves.append(self.index)
-			updateList(session.player, mylist, moves[len(moves) - 1])
+			moves.append((self.index, session.player))
+			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			if checkWin(canvas):
 				session.play = False
 				return
@@ -280,19 +281,20 @@ def placePiece(event, self, canvas, mylist):
 			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
 			point.occupied = True
 			updateMonomials(point.index)
+			moves.append((calculatedPoint, session.player))
+			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			if checkWin(canvas):
 				session.play = False
 				return
-			moves.append(calculatedPoint)
-			updateList(session.player, mylist, moves[len(moves) - 1])
+			
 			session.player = 1
 		else:
 			print("We entered this part of the function")
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			self.occupied = True
 			updateMonomials(self.index)
-			moves.append(self.index)
-			updateList(session.player, mylist, moves[len(moves) - 1])
+			moves.append((self.index, session.player))
+			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			session.player = 1
 	canvas.update()
 	mylist.update()
@@ -425,6 +427,7 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 		x+=31
 		canvas.create_line(x + 15, 85, x + 15, 645, fill = "black", width = 1)
 	session.title = canvas.create_text(session.width/2, 40, text="Gomoku", fill="white", font="Helvetica 40 bold ")
+	masterMonomials = monomials
 	createMasterMonomials(monomials)
 	setIntialBoardPlaceScores(board)
 
@@ -432,11 +435,19 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 
 #Undo previous move
 def undo(canvas,mylist):
+	currentSession = session.player
 	if moves:
-		index = moves[len(moves) - 1]
+		index = moves[len(moves) - 1][0]
+		print("Deleting ,",moves[len(moves) - 1][0])
 		canvas.delete(board[index[0]][index[1]].mark)
 		canvas.update()
 
+		moves.pop()
+
+		createMasterMonomials(masterMonomials)
+		setIntialBoardPlaceScores(board)
+
+		
 
 
 #Resets all data structures storing data and the canvas
