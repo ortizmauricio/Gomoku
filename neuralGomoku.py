@@ -129,11 +129,22 @@ def updateMonomials(index):
 
 def openThreeOffensive():
 	urgentMonomials = []
+	obviousWin = []
 	for monomial in computer_monomials:
 		if monomial.isAlive:
-			if len(monomial.boardPoints) <= 2:
+			if len(monomial.boardPoints) == 2:
 				urgentMonomials.append(monomial)
-	return urgentMonomials
+
+	for monomial in urgentMonomials:
+		print((monomial.boardPoints[1][0], monomial.boardPoints[0][0]))
+		if monomial.boardPoints[1][0] - monomial.boardPoints[0][0] == 4 or monomial.boardPoints[1][1] - monomial.boardPoints[0][1] == 4:
+			print(monomial.boardPoints, "was appended to obvious win")
+			obviousWin.append(monomial)
+
+	if not obviousWin:
+		return urgentMonomials
+	else:
+		return obviousWin
 
 def openFourOffensive():
 	urgentMonomials = []
@@ -165,7 +176,7 @@ def firstLayerReflexiveOffensive():
 	urgentMonomials = openFourOffensive()
 	
 	if not urgentMonomials:
-		print("We are checking for an open three")
+		print("We are checking for an offensive open three")
 		urgentMonomials = openThreeOffensive()
 
 	print("These are the urgent monomials ")
