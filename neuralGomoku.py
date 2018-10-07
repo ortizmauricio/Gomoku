@@ -73,7 +73,7 @@ class Monomial:
 
 #Board place object that calls place piece on click
 class boardPlace:
-	def __init__(self, x, y, canvas, index):
+	def __init__(self, x, y, canvas, mylist, index):
 		self.x = x
 		self.y = y
 		self.index = index
@@ -83,7 +83,7 @@ class boardPlace:
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
-		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas))
+		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas, mylist))
 
 
 	def oppScoreIncrement(self, score):
@@ -244,15 +244,15 @@ def computerNearOpponent(self):
 	print(initialMoves)
 	return initialMoves[choice]
 
-def computerInitialMove(canvas):
+def computerInitialMove(canvas, mylist):
 	session.player = 2
 	calculatedPoint = boardAnalysis()
 	print("The chosen point is ", calculatedPoint )
 	event = 0
-	placePiece(event, board[calculatedPoint[0]][calculatedPoint[1]], canvas)
+	placePiece(event, board[calculatedPoint[0]][calculatedPoint[1]], canvas, mylist)
 
 
-def placePiece(event, self, canvas):
+def placePiece(event, self, canvas, mylist):
 	if session.play:
 		print("We entered the function")
 		if session.player == 1 and self.occupied == False:
@@ -261,6 +261,7 @@ def placePiece(event, self, canvas):
 
 			updateMonomials(self.index)
 			print("Point placed at ", self.index)
+			updateList(session.player, mylist, self.index)
 			if checkWin(canvas):
 				session.play = False
 				return
@@ -280,15 +281,25 @@ def placePiece(event, self, canvas):
 			if checkWin(canvas):
 				session.play = False
 				return
-
+			updateList(session.player, mylist, calculatedPoint)
 			session.player = 1
 		else:
 			print("We entered this part of the function")
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			self.occupied = True
 			updateMonomials(self.index)
+			updateList(session.player, mylist, self.index)
 			session.player = 1
 	canvas.update()
+	mylist.update()
+
+def updateList(player, mylist, index):
+	if player == 1:
+		message = "Opponent: " + str(index)
+		
+	else:
+		message = "Computer: " + str(index)
+	mylist.insert(END, message)
 
 
 #Checks for win and displays message
@@ -385,7 +396,7 @@ def generateMonomials(index):
 
 #Board is created, each board place is an object, default title is also placed
 #Globoal variable is set to determine whether human or computer goes first
-def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
+def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 	session.humanFirst = option
 	monomials =[]
 	for row in range(19):
@@ -399,7 +410,7 @@ def createBoard(canvas, option, x = ((session.width - 570)/2), y = 40):
 			monomials = generateMonomials((row, col)) + monomials
 
 			#First layer creation
-			board[row].append(boardPlace(x, y, canvas, (row, col)))
+			board[row].append(boardPlace(x, y, canvas, mylist, (row, col)))
 			x+=1
 				
 		canvas.create_line(55, y + 15, 615, y + 15,fill = "black", width = 1)
@@ -429,27 +440,39 @@ a human or computer is starting the game first, this can be altered, by
 changing the game mode
 '''
 def run(width = session.width, height = session.height):
-	def createBoardWrapper(canvas, first):
+	def createBoardWrapper(canvas, mylist, first):
 		session.hardReset()
 		resetData(canvas)
 		if first == 1:
-			createBoard(canvas, True)
+			createBoard(canvas, mylist, True)
 		else:
-			createBoard(canvas, False)
-			computerInitialMove(canvas)
+			createBoard(canvas, mylist, False)
+			computerInitialMove(canvas, mylist)
 		canvas.update()
 
 	root = Tk()
+	scrollbar = Scrollbar(root)
+	scrollbar.pack( side = LEFT, fill = Y )
+
+	mylist = Listbox(root, yscrollcommand = scrollbar.set )
+	
+	mylist.pack( side = LEFT, fill = BOTH )
+	scrollbar.config( command = mylist.yview )
+
 	canvas = Canvas(root, width = width, height = height, background = "grey")
 	canvas.pack()
 
-	createBoardWrapper(canvas, 1)
+
+
+	createBoardWrapper(canvas, mylist, 1)
+
+
 
 	menubar = Menu(root)
 
 	optionmenu = Menu(menubar, tearoff=0)
-	optionmenu.add_command(label="Human First", command = lambda: createBoardWrapper(canvas, 1))
-	optionmenu.add_command(label="Computer First", command = lambda: createBoardWrapper(canvas, 2) )
+	optionmenu.add_command(label="Human First", command = lambda: createBoardWrapper(canvas, mylist, 1))
+	optionmenu.add_command(label="Computer First", command = lambda: createBoardWrapper(canvas, mylist, 2) )
 	optionmenu.add_command(label="Exit", command=root.quit)
 	menubar.add_cascade(label="Options", menu=optionmenu)
 	root.config(menu = menubar)
