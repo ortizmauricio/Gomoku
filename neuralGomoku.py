@@ -263,6 +263,8 @@ def placePiece(event, self, canvas, mylist):
 
 			updateMonomials(self.index)
 			print("Point placed at ", self.index)
+
+			"""
 			moves.append((self.index, session.player))
 			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			if checkWin(canvas):
@@ -283,6 +285,7 @@ def placePiece(event, self, canvas, mylist):
 			updateMonomials(point.index)
 			moves.append((calculatedPoint, session.player))
 			updateList(session.player, mylist, moves[len(moves) - 1][0])
+			"""
 			if checkWin(canvas):
 				session.play = False
 				return
@@ -296,6 +299,13 @@ def placePiece(event, self, canvas, mylist):
 			moves.append((self.index, session.player))
 			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			session.player = 1
+
+	for row in range(19):
+		for col in range(19):
+			print(board[row][col].index)
+			print( "   oppScore: ", board[row][col].oppScore, " comScore", board[row][col].comScore)
+
+
 	canvas.update()
 	mylist.update()
 
@@ -338,6 +348,10 @@ def setIntialBoardPlaceScores(board):
 				if board[row][col].index in point.boardPoints:
 					board[row][col].comScore += 1
 					board[row][col].oppScore += 1
+	for row in range(19):
+		for col in range(19):
+			print(board[row][col].index)
+			print( "   oppScore: ", board[row][col].oppScore, " comScore", board[row][col].comScore)
 
 #Populates master_monomials with monomial objects
 def createMasterMonomials(monomials):
