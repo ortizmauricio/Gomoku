@@ -7,8 +7,7 @@ random.seed()
 board =[]
 
 #Monomials from human and computer
-computer_monomials = []
-opponent_monomials = []
+master_monomials
 
 #Moves in chronological order
 moves = []
@@ -41,10 +40,14 @@ session = Game()
 
 class Monomial:
 	def __init__(self):
-		self.score = 1;
+		self.comScore = 1;
+		self.oppScore = 1;
+
 		self.originalPoints =[]
 		self.boardPoints =[]
-		self.isAlive = True
+		
+		self.isComAlive = True
+		self.isOppAlive = True
 
 	def kill(self):
 		self.isAlive = False
@@ -107,6 +110,14 @@ class boardPlace:
 			session.player = 2
 		else:
 			session.player = 1
+
+	def updateMonomials():
+		if session.player == 1:
+			print("Incrementing opponent and decrementing computer")
+			for monomial in self.monomials:
+
+		else:
+			print("Incrementing opponent and decrementing computer")
 
 	def placePiece(self, canvas):
 		if session.play:
@@ -378,15 +389,9 @@ def createMasterMonomials(monomials):
 
 	for monomial in noDuplicates:
 		tmpMonomial = Monomial()
-		tmpMonomial2 = Monomial()
 		tmpMonomial.boardPoints = copy.deepcopy(monomial)
-		tmpMonomial2.boardPoints = copy.deepcopy(monomial)
-
 		tmpMonomial.originalPoints = copy.deepcopy(monomial)
-		tmpMonomial2.originalPoints = copy.deepcopy(monomial)
-
-		computer_monomials.append(tmpMonomial)
-		opponent_monomials.append(tmpMonomial2)
+		master_monomials.append(tmpMonomial)
 
 #Generates monomials for specified point (tuple)
 def generateMonomials(index):
