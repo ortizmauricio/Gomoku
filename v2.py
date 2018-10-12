@@ -120,7 +120,6 @@ class boardPlace:
 			if not self.occupied:
 				if session.humanTurn:
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
-					
 				else:
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			
@@ -128,33 +127,6 @@ class boardPlace:
 			self.alternatePlayer()
 			self.occupied = True
 			canvas.update()
-
-def updateMonomials(index):
-	if session.player == 1:
-		print("Incrementing opponent and decrementing computer")
-		for monomial in opponent_monomials:
-			if monomial.isAlive:
-				if index in monomial.boardPoints:
-					monomial.boardPoints.remove(index)
-					monomial.increment()
-		for monomial in computer_monomials:
-			if(len(monomial.boardPoints) < 5):
-				print(monomial.boardPoints)
-			if index in monomial.boardPoints:
-				monomial.kill()
-				monomial.decrement()
-	else:
-		print("Incrementing computer and decrementing opponent")
-		for monomial in computer_monomials:
-			if monomial.isAlive:
-				if index in monomial.boardPoints:
-					monomial.boardPoints.remove(index)
-					monomial.increment()
-		for monomial in opponent_monomials:
-			if index in monomial.boardPoints:
-				monomial.kill()
-				monomial.decrement()
-
 
 def openThreeOffensive():
 	urgentMonomials = []
