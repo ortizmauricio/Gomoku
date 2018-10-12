@@ -6,8 +6,10 @@ random.seed()
 #All board objects
 board =[]
 
-#Monomials from human and computer
-master_monomials
+#Monomials from human and computer, accesible by original boardpoints
+master_monomials = []
+computer_monomials = []
+opponent_monomials = []
 
 #Moves in chronological order
 moves = []
@@ -23,7 +25,6 @@ class Game:
 		self.lastComputerPosition = 0
 		self.title = 0
 		self.humanFirst = True
-		self.size = 5
 
 	def hardReset(self):
 		self.play = True
@@ -45,7 +46,7 @@ class Monomial:
 
 		self.originalPoints =[]
 		self.boardPoints =[]
-		
+
 		self.isComAlive = True
 		self.isOppAlive = True
 
@@ -114,7 +115,7 @@ class boardPlace:
 	def updateMonomials():
 		if session.player == 1:
 			print("Incrementing opponent and decrementing computer")
-			for monomial in self.monomials:
+			#for monomial in self.monomials:
 
 		else:
 			print("Incrementing opponent and decrementing computer")
@@ -130,8 +131,6 @@ class boardPlace:
 			self.alternatePlayer()
 			self.occupied = True
 			canvas.update()
-
-
 
 def updateMonomials(index):
 	if session.player == 1:
@@ -373,7 +372,7 @@ def checkWin(canvas):
 def setIntialBoardPlaceScores(board):
 	for row in range(19):
 		for col in range(19):
-			for monomial in opponent_monomials:
+			for monomial in master_monomials:
 				if board[row][col].index in monomial.boardPoints:
 					board[row][col].comScore += 1
 					board[row][col].oppScore += 1
