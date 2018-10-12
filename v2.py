@@ -87,7 +87,7 @@ class boardPlace:
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
-		canvas.tag_bind(self.visual, '<Button-1>', lambda event: placePiece(event, self, canvas, mylist))
+		canvas.tag_bind(self.visual, '<Button-1>', lambda event: self.placePiece(canvas))
 
 
 	def oppScoreIncrement(self, score):
@@ -101,6 +101,25 @@ class boardPlace:
 
 	def comScoreDecrement(self, score):
 		self.comScore -= score
+
+	def alternatePlayer(self):
+		if session.player == 1:
+			session.player = 2
+		else:
+			session.player = 1
+
+	def placePiece(self, canvas):
+		if session.play:
+			if not self.occupied:
+				if session.player == 1:
+					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+				else:
+					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
+			
+			self.alternatePlayer()
+			self.occupied = True
+			canvas.update()
+
 
 
 def updateMonomials(index):
@@ -258,6 +277,12 @@ def computerInitialMove(canvas, mylist):
 def placePiece(event, self, canvas, mylist):
 	if session.play:
 		print("We entered the function")
+
+
+
+
+
+
 		if session.player == 1 and self.occupied == False:
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 			self.occupied = True
