@@ -25,6 +25,7 @@ class Game:
 		self.lastComputerPosition = 0
 		self.title = 0
 		self.humanFirst = True
+		self.humanTurn = True
 
 	def hardReset(self):
 		self.play = True
@@ -49,6 +50,9 @@ class Monomial:
 
 		self.isComAlive = True
 		self.isOppAlive = True
+
+	def update(self):
+		pass
 
 	def kill(self):
 		self.isAlive = False
@@ -107,23 +111,23 @@ class boardPlace:
 		self.comScore -= score
 
 	def alternatePlayer(self):
-		if session.player == 1:
-			session.player = 2
+		if session.humanTurn:
+			session.humanTurn = False
 		else:
-			session.player = 1
+			session.humanTurn = True
 
 	def updateMonomials():
-		if session.player == 1:
+		if session.humanTurn:
 			print("Incrementing opponent and decrementing computer")
-			#for monomial in self.monomials:
-
+			for monomial in self.monomials:
+				monomial.update()
 		else:
 			print("Incrementing opponent and decrementing computer")
 
 	def placePiece(self, canvas):
 		if session.play:
 			if not self.occupied:
-				if session.player == 1:
+				if session.humanTurn:
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 				else:
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
