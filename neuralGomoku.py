@@ -10,7 +10,7 @@ board =[]
 computer_monomials = []
 opponent_monomials = []
 masterMonomials = []
-
+monomialHistory = []
 #Moves in chronological order
 moves = []
 
@@ -36,6 +36,7 @@ class Game:
 		self.lastComputerPosition = 0
 		self.title = 0
 		self.humanFirst = True	
+		self.first = 0
 
 session = Game()
 
@@ -100,6 +101,11 @@ class boardPlace:
 
 	def comScoreDecrement(self, score):
 		self.comScore -= score
+
+	def update(self, previousCopy):
+		self.occupied = False
+		self.comScore = previousCopy.comScore
+		self.oppScore = previousCopy.oppScore
 
 
 def updateMonomials(index):
@@ -256,15 +262,14 @@ def computerInitialMove(canvas, mylist):
 
 def placePiece(event, self, canvas, mylist):
 	if session.play:
-		print("We entered the function")
+		print("This is session player and self occupied: ", session.player, self.occupied)
 		if session.player == 1 and self.occupied == False:
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 			self.occupied = True
 
 			updateMonomials(self.index)
+			monomialHistory.append((copy.deepcopy(computer_monomials), copy.deepcopy(opponent_monomials), copy.deepcopy(board)))
 			print("Point placed at ", self.index)
-
-			"""
 			moves.append((self.index, session.player))
 			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			if checkWin(canvas):
@@ -283,9 +288,9 @@ def placePiece(event, self, canvas, mylist):
 			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
 			point.occupied = True
 			updateMonomials(point.index)
+			monomialHistory.append((copy.deepcopy(computer_monomials), copy.deepcopy(opponent_monomials), copy.deepcopy(board)))
 			moves.append((calculatedPoint, session.player))
 			updateList(session.player, mylist, moves[len(moves) - 1][0])
-			"""
 			if checkWin(canvas):
 				session.play = False
 				return
@@ -296,16 +301,10 @@ def placePiece(event, self, canvas, mylist):
 			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			self.occupied = True
 			updateMonomials(self.index)
+			monomialHistory.append((copy.deepcopy(computer_monomials), copy.deepcopy(opponent_monomials), copy.deepcopy(board)))
 			moves.append((self.index, session.player))
 			updateList(session.player, mylist, moves[len(moves) - 1][0])
 			session.player = 1
-
-	for row in range(19):
-		for col in range(19):
-			print(board[row][col].index)
-			print( "   oppScore: ", board[row][col].oppScore, " comScore", board[row][col].comScore)
-
-
 	canvas.update()
 	mylist.update()
 
@@ -348,10 +347,6 @@ def setIntialBoardPlaceScores(board):
 				if board[row][col].index in point.boardPoints:
 					board[row][col].comScore += 1
 					board[row][col].oppScore += 1
-	for row in range(19):
-		for col in range(19):
-			print(board[row][col].index)
-			print( "   oppScore: ", board[row][col].oppScore, " comScore", board[row][col].comScore)
 
 #Populates master_monomials with monomial objects
 def createMasterMonomials(monomials):
@@ -445,23 +440,47 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 	createMasterMonomials(monomials)
 	setIntialBoardPlaceScores(board)
 
+def changeData():
+	for row in range(19):
+		for col in range(19):
+			board[row][col].update(monomialHistory[len(monomialHistory)-1][2][row][col])
+	
+	for monomial in monomialHistory[len(monomialHistory) - 1][0]:
+		computer_monomials.append(copy.deepcopy(monomial))
+
+	for monomial in monomialHistory[len(monomialHistory) - 1][1]:
+		opponent_monomials.append(copy.deepcopy(monomial))
+
+	
 
 
 #Undo previous move
 def undo(canvas,mylist):
 	currentSession = session.player
-	if moves:
+	if len(moves) > 0:
 		index = moves[len(moves) - 1][0]
-		print("Deleting ,",moves[len(moves) - 1][0])
+		message = "Undo: " + str(moves[len(moves) - 1][0])
+		mylist.insert(END, message)
 		canvas.delete(board[index[0]][index[1]].mark)
 		canvas.update()
 
+		computer_monomials.clear()
+		opponent_monomials.clear()
+		changeData()
+		
+		monomialHistory.pop()
 		moves.pop()
 
-		createMasterMonomials(masterMonomials)
-		setIntialBoardPlaceScores(board)
+		session.player = 1
+		if len(moves) == 0:
+			if session.first == 1:
+				session.humanFirst = True
+			else:
+				session.humanFirst = False
+				session.player = 2
+				computerInitialMove(canvas, mylist)
+		print(session.player)
 
-		
 
 
 #Resets all data structures storing data and the canvas
@@ -485,8 +504,10 @@ def run(width = session.width, height = session.height):
 		resetData(canvas, mylist)
 		if first == 1:
 			createBoard(canvas, mylist, True)
+			session.first = 1
 		else:
 			createBoard(canvas, mylist, False)
+			session.first = 2
 			computerInitialMove(canvas, mylist)
 		canvas.update()
 

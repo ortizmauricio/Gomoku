@@ -61,7 +61,6 @@ class Monomial:
 					board[point[0]][point[1]].oppScoreIncrement(self.oppScore)
 					board[point[0]][point[1]].comScoreDecrement(self.comScore)
 
-				
 		else:
 			if self.isComAlive:
 				self.comScore *= 2
@@ -121,6 +120,7 @@ class boardPlace:
 			if not self.occupied:
 				if session.humanTurn:
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
+					
 				else:
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			
@@ -128,12 +128,6 @@ class boardPlace:
 			self.alternatePlayer()
 			self.occupied = True
 			canvas.update()
-
-
-			for row in range(19):
-				for col in range(19):
-					print(board[row][col].index)
-					print( "   oppScore: ", board[row][col].oppScore, " comScore", board[row][col].comScore)
 
 def updateMonomials(index):
 	if session.player == 1:
