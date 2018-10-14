@@ -112,6 +112,8 @@ class boardPlace:
 		self.x = x
 		self.y = y
 		self.index = index
+		self.isComAlive = False
+		self.isOppAlive = False
 		self.occupied = False;
 		self.comScore = 0
 		self.oppScore = 0
@@ -159,6 +161,12 @@ class boardPlace:
 	def undoMonomial(self):
 		for monomial in self.monomials:
 			monomial.undo(self.index)
+			
+		if self.isOppAlive:
+			self.isOppAlive = False
+
+		if self.isComAlive:
+			self.isComAlive = False
 
 	def updateList(self, mylist):
 		if session.humanTurn:
@@ -173,9 +181,11 @@ class boardPlace:
 			if not self.occupied:
 				if session.humanTurn:
 					print("Oppenent placed point at ", self.index, " \n")
+					self.isOppAlive = True
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 				else:
 					print("Computer placed point at ", self.index, " \n")
+					self.isComAlive = True
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			
 			self.updateMonomials()
@@ -473,7 +483,6 @@ def changeTitle(canvas):
 		session.title = canvas.create_text(session.width/2, 40, text="Human Wins!", fill="white", font="Helvetica 40 bold ")
 	else:
 		session.title = canvas.create_text(session.width/2, 40, text="Computer Wins!", fill="white", font="Helvetica 40 bold ")
-
 
 #Resets all data structures storing data and the canvas
 def resetData(canvas, mylist):
