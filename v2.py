@@ -46,29 +46,44 @@ class Monomial:
 		self.oppScore = 1;
 
 		self.originalPoints =[]
-		self.boardPoints =[]
+		self.comBoardPoints =[]
+		self.oppBoardPoints =[]
 
 		self.isComAlive = True
 		self.isOppAlive = True
 
+	def setPoints(self, points):
+		self.originalPoints = copy.deepcopy(points)
+		self.comBoardPoints = copy.deepcopy(points)
+		self.oppBoardPoints = copy.deepcopy(points)
+
 	def update(self, index):
 		if session.humanTurn:
-			if self.isOppAlive:
-				self.oppScore *= 2
-				self.isComAlive = False
-				self.boardPoints.remove(index)
-				for point in self.boardPoints:
-					board[point[0]][point[1]].oppScoreIncrement(self.oppScore)
-					board[point[0]][point[1]].comScoreDecrement(self.comScore)
+			self.oppScore *= 2
+			self.killCom()
+			print(index, "is removed")
+			self.oppBoardPoints.remove(index)
+			self.comBoardPoints.remove(index)
+			for point in self.oppBoardPoints:
+				board[point[0]][point[1]].oppScoreIncrement(self.oppScore)
+				board[point[0]][point[1]].comScoreDecrement(self.comScore)
+
 
 		else:
-			if self.isComAlive:
-				self.comScore *= 2
-				self.isOppAlive = False
-				self.boardPoints.remove(index)
-				for point in self.boardPoints:
-					board[point[0]][point[1]].oppScoreDecrement(self.oppScore)
-					board[point[0]][point[1]].comScoreIncrement(self.comcore)
+			self.comScore *= 2
+			self.killOpp()
+			print(index, "is removed")
+			self.oppBoardPoints.remove(index)
+			self.comBoardPoints.remove(index)
+			for point in self.comBoardPoints:
+				board[point[0]][point[1]].oppScoreDecrement(self.oppScore)
+				board[point[0]][point[1]].comScoreIncrement(self.comScore)
+
+	def killCom(self):
+		self.isComAlive = False
+
+	def killOpp(self):
+		self.isOppAlive = False
 
 				
 
@@ -111,35 +126,54 @@ class boardPlace:
 			print("Incrementing opponent and decrementing computer")
 			for monomial in self.monomials:
 				monomial.update(self.index)
+
+				for monomial2 in master_monomials:
+					if monomial2 == monomial:
+						if monomial2.oppBoardPoints == monomial.oppBoardPoints:
+							print("Same list")
+
 		else:
 			print("Incrementing computer and decrementing opponent")
+			for monomial in self.monomials:
+				monomial.update(self.index)
+
+				for monomial2 in master_monomials:
+					if monomial2 == monomial:
+						if monomial2.comBoardPoints == monomial.comBoardPoints:
+							print("computer same list")
 
 
 	def placePiece(self, canvas):
 		if session.play:
 			if not self.occupied:
 				if session.humanTurn:
+					print("Oppenent placed point at ", self.index, " \n")
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
 				else:
+					print("Computer placed point at ", self.index, " \n")
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
-			
 			self.updateMonomials()
 			self.alternatePlayer()
 			self.occupied = True
 			canvas.update()
 
+			if not session.humanTurn:
+				computerMove(self.index, canvas)
+
+#Check for open three scenarios, starts by prioiritizing open threes
+#where all pieces are next to each other
 def openThreeOffensive():
 	urgentMonomials = []
 	obviousWin = []
-	for monomial in computer_monomials:
-		if monomial.isAlive:
-			if len(monomial.boardPoints) == 2:
+	for monomial in master_monomials:
+		if monomial.isComAlive:
+			if len(monomial.comBoardPoints) == 2:
 				urgentMonomials.append(monomial)
 
 	for monomial in urgentMonomials:
-		print((monomial.boardPoints[1][0], monomial.boardPoints[0][0]))
-		if monomial.boardPoints[1][0] - monomial.boardPoints[0][0] == 4 or monomial.boardPoints[1][1] - monomial.boardPoints[0][1] == 4:
-			print(monomial.boardPoints, "was appended to obvious win")
+		print((monomial.comBoardPoints[1][0], monomial.comBoardPoints[0][0]))
+		if monomial.comBoardPoints[1][0] - monomial.comBoardPoints[0][0] == 4 or monomial.comBoardPoints[1][1] - monomial.comBoardPoints[0][1] == 4:
+			print(monomial.comBoardPoints, monomial.originalPoints, monomial.isOppAlive, monomial.isComAlive, " was appended to obvious win")
 			obviousWin.append(monomial)
 
 	if not obviousWin:
@@ -147,28 +181,31 @@ def openThreeOffensive():
 	else:
 		return obviousWin
 
+#Check one move away wins for computer
 def openFourOffensive():
 	urgentMonomials = []
-	for monomial in computer_monomials:
-		if monomial.isAlive:
-			if len(monomial.boardPoints) == 1:
+	for monomial in master_monomials:
+		if monomial.isComAlive:
+			if len(monomial.comBoardPoints) == 1:
 				urgentMonomials.append(monomial)
 	return urgentMonomials
 
+#Check for any open three scenario from opponent perspective
 def openThree():
 	urgentMonomials = []
-	for monomial in opponent_monomials:
-		if monomial.isAlive:
-			if len(monomial.boardPoints) <= 2:
+	for monomial in master_monomials:
+		if monomial.isOppAlive:
+			if len(monomial.oppBoardPoints) <= 2:
 				urgentMonomials.append(monomial)
 	return urgentMonomials
 
+#Check for closed four from opponent perspective
 def closedFour():
 	urgentMonomials = []
-	for monomial in opponent_monomials:
-		if monomial.isAlive:
-			if len(monomial.boardPoints) == 1:
-				print("This closed four monomial is alive", monomial.boardPoints)
+	for monomial in master_monomials:
+		if monomial.isOppAlive:
+			if len(monomial.oppBoardPoints) == 1:
+				print("This closed four monomial is alive", monomial.oppBoardPoints, monomial.originalPoints)
 				urgentMonomials.append(monomial)
 	return urgentMonomials
 
@@ -180,9 +217,9 @@ def firstLayerReflexiveOffensive():
 		print("We are checking for an offensive open three")
 		urgentMonomials = openThreeOffensive()
 
-	print("These are the urgent monomials ")
+	print("These are the urgent monomials offensive ")
 	for monomial in urgentMonomials:
-		print(monomial.boardPoints, monomial.isAlive)
+		print(monomial.comBoardPoints, monomial.isComAlive)
 	return urgentMonomials	
 
 
@@ -194,9 +231,9 @@ def firstLayerReflexive():
 		print("We are checking for an open three")
 		urgentMonomials = openThree()
 
-	print("These are the urgent monomials ")
+	print("These are the urgent monomials defensive ")
 	for monomial in urgentMonomials:
-		print(monomial.boardPoints, monomial.isAlive)
+		print(monomial.oppBoardPoints, monomial.isOppAlive)
 	return urgentMonomials	
 
 def boardAnalysis():
@@ -207,22 +244,22 @@ def boardAnalysis():
 
 	if openThreeOrOpenFourOffensive:
 		for monomial in openThreeOrOpenFourOffensive:
-			for point in monomial.boardPoints:
+			for point in monomial.comBoardPoints:
 					if (board[point[0]][point[1]].comScore, point) not in rankedPoints:
 						rankedPoints.append((board[point[0]][point[1]].oppScore, point))
 	elif not openThreeOrClosedFour:
-		for monomial in computer_monomials:
-			if monomial.isAlive == True:
-				for point in monomial.boardPoints:
+		for monomial in master_monomials:
+			if monomial.isComAlive:
+				for point in monomial.comBoardPoints:
 					if (board[point[0]][point[1]].comScore, point) not in rankedPoints:
 						rankedPoints.append((board[point[0]][point[1]].comScore, point))
 	else:
 		for monomial in openThreeOrClosedFour:
-			for point in monomial.boardPoints:
+			for point in monomial.oppBoardPoints:
 					if (board[point[0]][point[1]].oppScore, point) not in rankedPoints:
 						rankedPoints.append((board[point[0]][point[1]].oppScore, point))
-		print(rankedPoints)
 
+	print("The length of ranked points is ", len(rankedPoints))
 	rankedPoints.sort(reverse = True)
 
 	maxScore = rankedPoints[0][0]
@@ -231,15 +268,30 @@ def boardAnalysis():
 			topScoring.append(point)
 
 	choice = random.randint(0, (len(topScoring) - 1))
+	print("Top scoring choice is ", topScoring[choice][1])
 	return topScoring[choice][1]
 
-def computerNearOpponent(self):
+
+def computerMove(index, canvas):
+	if session.play:
+		if session.humanFirst:
+			session.humanFirst = False
+			calculatedPoint = computerNearOpponent(index)
+		else:
+			calculatedPoint = boardAnalysis()
+
+		row = calculatedPoint[0]
+		col = calculatedPoint[1]
+		board[row][col].placePiece(canvas)
+
+
+def computerNearOpponent(index):
 	initialMoves = []
 	for row in range(2):
 		for col in range(2):
-			if (self.index[0] + 1 - row) < 19 and (self.index[0] + 1 - row) >= 0  and (self.index[1] + 1 - col) < 19 and (self.index[1] + 1 - col) >= 0:
-				if not self.index == (self.index[0] + 1 - row, self.index[1] + 1 - col):
-					initialMoves.append((self.index[0] + 1 - row, self.index[1] + 1 - col))
+			if (index[0] + 1 - row) < 19 and (index[0] + 1 - row) >= 0  and (index[1] + 1 - col) < 19 and (index[1] + 1 - col) >= 0:
+				if not index == (index[0] + 1 - row, index[1] + 1 - col):
+					initialMoves.append((index[0] + 1 - row, index[1] + 1 - col))
 
 	choice = random.randint(0, (len(initialMoves) - 1))
 	print(initialMoves)
@@ -252,7 +304,7 @@ def computerInitialMove(canvas, mylist):
 	event = 0
 	placePiece(event, board[calculatedPoint[0]][calculatedPoint[1]], canvas, mylist)
 
-
+'''
 def placePiece(event, self, canvas, mylist):
 	if session.play:
 		print("We entered the function")
@@ -312,7 +364,7 @@ def updateList(player, mylist, index):
 		message = "Computer: " + str(index)
 	mylist.insert(END, message)
 
-
+'''
 #Checks for win and displays message
 def checkWin(canvas):
 	win = False
@@ -342,15 +394,11 @@ def setIntialBoardPlaceScores(board):
 	for row in range(19):
 		for col in range(19):
 			for monomial in master_monomials:
-				if board[row][col].index in monomial.boardPoints:
+				if board[row][col].index in monomial.originalPoints:
 					board[row][col].comScore += 1
 					board[row][col].oppScore += 1
 					board[row][col].monomials.append(monomial)
 
-	for row in range(19):
-				for col in range(19):
-					print(board[row][col].index)
-					print( "   oppScore: ", board[row][col].oppScore, " comScore", board[row][col].comScore)
 #Populates master_monomials with monomial objects
 def createMasterMonomials(monomials):
 	noDuplicates = []
@@ -361,9 +409,10 @@ def createMasterMonomials(monomials):
 
 	for monomial in noDuplicates:
 		tmpMonomial = Monomial()
-		tmpMonomial.boardPoints = copy.deepcopy(monomial)
-		tmpMonomial.originalPoints = copy.deepcopy(monomial)
+		tmpMonomial.setPoints(copy.deepcopy(monomial))
 		master_monomials.append(tmpMonomial)
+
+	print(len(master_monomials))
 
 #Generates monomials for specified point (tuple)
 def generateMonomials(index):
