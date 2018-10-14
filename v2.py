@@ -339,67 +339,7 @@ def computerInitialMove(canvas, mylist):
 	event = 0
 	placePiece(event, board[calculatedPoint[0]][calculatedPoint[1]], canvas, mylist)
 
-'''
-def placePiece(event, self, canvas, mylist):
-	if session.play:
-		print("We entered the function")
 
-
-
-
-
-
-		if session.player == 1 and self.occupied == False:
-			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "white")
-			self.occupied = True
-
-			updateMonomials(self.index)
-			print("Point placed at ", self.index)
-			moves.append((self.index, session.player))
-			updateList(session.player, mylist, moves[len(moves) - 1][0])
-			if checkWin(canvas):
-				session.play = False
-				return
-
-			session.player = 2				
-			if session.humanFirst:
-				session.humanFirst = False
-				calculatedPoint = computerNearOpponent(self)
-			else:
-				calculatedPoint = boardAnalysis()
-
-			print("point is ", calculatedPoint)
-			point = board[calculatedPoint[0]][calculatedPoint[1]]
-			point.mark = canvas.create_oval(point.x + 2, point.y + 2, point.x + 28, point.y + 28, fill = "black")
-			point.occupied = True
-			updateMonomials(point.index)
-			moves.append((calculatedPoint, session.player))
-			updateList(session.player, mylist, moves[len(moves) - 1][0])
-			if checkWin(canvas):
-				session.play = False
-				return
-			
-			session.player = 1
-		else:
-			print("We entered this part of the function")
-			self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
-			self.occupied = True
-			updateMonomials(self.index)
-			moves.append((self.index, session.player))
-			updateList(session.player, mylist, moves[len(moves) - 1][0])
-			session.player = 1
-	canvas.update()
-	mylist.update()
-
-def updateList(player, mylist, index):
-	if player == 1:
-		message = "Opponent: " + str(index)
-		
-	else:
-		message = "Computer: " + str(index)
-	mylist.insert(END, message)
-
-'''
 #Checks for win and displays message
 def checkWin(canvas):
 	win = False
@@ -579,7 +519,10 @@ def run(width = session.width, height = session.height):
 	createBoardWrapper(canvas, mylist, 1)
 
 	button = Button(root,text = "Undo", command =  lambda: undo(canvas, mylist))
+	button1 = Button(root,text = "Computer", command =  lambda: computerMove((0,0), canvas, mylist))
 	button.pack()
+	button1.pack()
+
 
 	menubar = Menu(root)
 
