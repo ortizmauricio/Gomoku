@@ -98,6 +98,21 @@ class Monomial:
 
 		self.oppBoardPoints.append(index)
 		self.comBoardPoints.append(index)
+		self.setAlive()
+
+	def setAlive(self):
+		oppCount = 0
+		comCount = 0
+		for point in self.originalPoints:
+			if board[point[0]][point[1]].isOppAlive:
+				oppCount+=1
+			if board[point[0]][point[1]].isComAlive:
+				comCount+=1
+
+		if oppCount == 0 and comCount > 1:
+			self.isComAlive = True
+		elif comCount == 0 and oppCount > 1:
+			self.isOppAlive = True
 
 	def checkWin(self):
 		if not self.comBoardPoints or not self.oppBoardPoints:
@@ -159,14 +174,14 @@ class boardPlace:
 				monomial.update(self.index)
 
 	def undoMonomial(self):
-		for monomial in self.monomials:
-			monomial.undo(self.index)
-			
 		if self.isOppAlive:
 			self.isOppAlive = False
 
 		if self.isComAlive:
 			self.isComAlive = False
+
+		for monomial in self.monomials:
+			monomial.undo(self.index)
 
 	def updateList(self, mylist):
 		if session.humanTurn:
