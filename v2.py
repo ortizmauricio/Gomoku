@@ -75,6 +75,22 @@ class Monomial:
 				board[point[0]][point[1]].oppScoreDecrement(self.oppScore)
 				board[point[0]][point[1]].comScoreIncrement(self.comScore)
 
+	def undo(self, index):
+		if session.humanTurn:
+			self.comScore /= 2
+			for point in self.comBoardPoints:
+				board[point[0]][point[1]].undoOppIncrement(self.oppScore)
+				board[point[0]][point[1]].comScoreDecrement(self.comScore)
+		else:
+			self.oppScore /= 2
+			for point in self.oppBoardPoints:
+				board[point[0]][point[1]].oppScoreDecrement(self.oppScore)
+				board[point[0]][point[1]].undoComIncrement(self.comScore)
+
+		self.oppBoardPoints.append(index)
+		self.comBoardPoints.append(index)
+
+
 	def killCom(self):
 		self.isComAlive = False
 
@@ -111,6 +127,12 @@ class boardPlace:
 	def comScoreDecrement(self, score):
 		self.comScore -= score
 
+	def undoOppIncrement(self, score):
+		self.oppScore += score
+
+	def undoComIncrement(self, score):
+		self.comScore += score
+
 	def alternatePlayer(self):
 		if session.humanTurn:
 			session.humanTurn = False
@@ -127,12 +149,17 @@ class boardPlace:
 			for monomial in self.monomials:
 				monomial.update(self.index)
 
+	def undoMonomial(self):
+		for monomial in self.monomials:
+			monomial.undo(self.index)
+
 	def updateList(self, mylist):
 		if session.humanTurn:
 			message = "Human placed at " + str(self.index)
 		else:
 			message = "Computer placed at " + str(self.index)
 		mylist.insert(END, message)
+		moves.append(self.index)
 
 	def placePiece(self, canvas, mylist):
 		if session.play:
@@ -149,8 +176,24 @@ class boardPlace:
 			self.occupied = True
 			canvas.update()
 
+			for row in range(6):
+				for col in range(6):
+					print(board[row][col].index, " oppScore: ", board[row][col].oppScore, " comScore: ", board[row][col].comScore )
+
 			if not session.humanTurn:
 				computerMove(self.index, canvas, mylist)
+
+	def undo(self, canvas):
+		canvas.delete(self.mark)
+		canvas.update()
+		self.occupied = False 
+		self.undoMonomial()
+		self.alternatePlayer()
+		print("Undo at ", self.index, " \n")
+		for row in range(6):
+				for col in range(6):
+					print(board[row][col].index, " oppScore: ", board[row][col].oppScore, " comScore: ", board[row][col].comScore )
+
 
 #Check for open three scenarios, starts by prioiritizing open threes
 #where all pieces are next to each other
@@ -391,6 +434,12 @@ def setIntialBoardPlaceScores(board):
 					board[row][col].oppScore += 1
 					board[row][col].monomials.append(monomial)
 
+	for row in range(6):
+		for col in range(6):
+			print(board[row][col].index, " oppScore: ", board[row][col].oppScore, " comScore: ", board[row][col].comScore )
+
+
+
 #Populates master_monomials with monomial objects
 def createMasterMonomials(monomials):
 	noDuplicates = []
@@ -405,7 +454,7 @@ def createMasterMonomials(monomials):
 		master_monomials.append(tmpMonomial)
 
 	print(len(master_monomials))
-
+	
 #Generates monomials for specified point (tuple)
 def generateMonomials(index):
 	monomials = []
@@ -482,7 +531,12 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 
 #Undo previous move
 def undo(canvas,mylist):
-	pass
+	if moves:
+		lastPosition = moves[-1]
+		moves.pop()
+		message = "Undo: " + str(lastPosition)
+		mylist.insert(END, message)
+		board[lastPosition[0]][lastPosition[1]].undo(canvas)
 
 #Resets all data structures storing data and the canvas
 def resetData(canvas, mylist):
