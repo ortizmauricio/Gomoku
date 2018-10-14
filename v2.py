@@ -61,18 +61,14 @@ class Monomial:
 		if session.humanTurn:
 			self.oppScore *= 2
 			self.killCom()
-			print(index, "is removed")
 			self.oppBoardPoints.remove(index)
 			self.comBoardPoints.remove(index)
 			for point in self.oppBoardPoints:
 				board[point[0]][point[1]].oppScoreIncrement(self.oppScore)
 				board[point[0]][point[1]].comScoreDecrement(self.comScore)
-
-
 		else:
 			self.comScore *= 2
 			self.killOpp()
-			print(index, "is removed")
 			self.oppBoardPoints.remove(index)
 			self.comBoardPoints.remove(index)
 			for point in self.comBoardPoints:
@@ -100,7 +96,7 @@ class boardPlace:
 
 		self.visual = canvas.create_rectangle(self.x, self.y, self.x + 30, self.y + 30, fill = "grey", outline = "grey", width = "1", activeoutline = "blue")
 
-		canvas.tag_bind(self.visual, '<Button-1>', lambda event: self.placePiece(canvas))
+		canvas.tag_bind(self.visual, '<Button-1>', lambda event: self.placePiece(canvas, mylist))
 
 
 	def oppScoreIncrement(self, score):
@@ -126,24 +122,19 @@ class boardPlace:
 			print("Incrementing opponent and decrementing computer")
 			for monomial in self.monomials:
 				monomial.update(self.index)
-
-				for monomial2 in master_monomials:
-					if monomial2 == monomial:
-						if monomial2.oppBoardPoints == monomial.oppBoardPoints:
-							print("Same list")
-
 		else:
 			print("Incrementing computer and decrementing opponent")
 			for monomial in self.monomials:
 				monomial.update(self.index)
 
-				for monomial2 in master_monomials:
-					if monomial2 == monomial:
-						if monomial2.comBoardPoints == monomial.comBoardPoints:
-							print("computer same list")
+	def updateList(self, mylist):
+		if session.humanTurn:
+			message = "Human placed at " + str(self.index)
+		else:
+			message = "Computer placed at " + str(self.index)
+		mylist.insert(END, message)
 
-
-	def placePiece(self, canvas):
+	def placePiece(self, canvas, mylist):
 		if session.play:
 			if not self.occupied:
 				if session.humanTurn:
@@ -153,12 +144,13 @@ class boardPlace:
 					print("Computer placed point at ", self.index, " \n")
 					self.mark = canvas.create_oval(self.x + 2, self.y + 2, self.x + 28, self.y + 28, fill = "black")
 			self.updateMonomials()
+			self.updateList(mylist)
 			self.alternatePlayer()
 			self.occupied = True
 			canvas.update()
 
 			if not session.humanTurn:
-				computerMove(self.index, canvas)
+				computerMove(self.index, canvas, mylist)
 
 #Check for open three scenarios, starts by prioiritizing open threes
 #where all pieces are next to each other
@@ -272,7 +264,7 @@ def boardAnalysis():
 	return topScoring[choice][1]
 
 
-def computerMove(index, canvas):
+def computerMove(index, canvas, mylist):
 	if session.play:
 		if session.humanFirst:
 			session.humanFirst = False
@@ -282,7 +274,7 @@ def computerMove(index, canvas):
 
 		row = calculatedPoint[0]
 		col = calculatedPoint[1]
-		board[row][col].placePiece(canvas)
+		board[row][col].placePiece(canvas, mylist)
 
 
 def computerNearOpponent(index):
@@ -491,9 +483,6 @@ def createBoard(canvas, mylist, option, x = ((session.width - 570 )/2), y = 40):
 #Undo previous move
 def undo(canvas,mylist):
 	pass
-
-		
-
 
 #Resets all data structures storing data and the canvas
 def resetData(canvas, mylist):
