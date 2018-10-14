@@ -479,10 +479,15 @@ def undo(canvas,mylist):
 			mylist.insert(END, message)
 			board[lastPosition[0]][lastPosition[1]].undo(canvas)
 
-			if not moves and not session.computerFirst:
+			if len(moves) == 1 and not session.computerFirst:
+				print("session human first set to true")
+				session.humanFirst = True
+			elif not moves and not session.computerFirst:
 				session.humanFirst = True
 			elif not moves and session.computerFirst:
 				computerMove((0,0), canvas, mylist)
+
+
 	else:
 		session.play = True
 		resetTitle(canvas)
@@ -504,6 +509,7 @@ def resetData(canvas, mylist):
 	canvas.delete(ALL)
 	mylist.delete(0, END)
 	board.clear()
+	moves.clear
 	master_monomials.clear()
 
 
@@ -540,7 +546,7 @@ def run(width = session.width, height = session.height):
 	createBoardWrapper(canvas, mylist, 1)
 
 	button = Button(root,text = "Undo", command =  lambda: undo(canvas, mylist))
-	button1 = Button(root,text = "Computer", command =  lambda: computerMove((0,0), canvas, mylist))
+	button1 = Button(root,text = "Computer", command =  lambda: computerMove(moves[-1], canvas, mylist))
 	button.pack()
 	button1.pack()
 
